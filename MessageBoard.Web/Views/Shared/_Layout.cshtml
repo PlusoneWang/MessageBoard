@@ -21,10 +21,9 @@
                     {
                         <li class="nav-item dropdown active">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                @*@((this.ViewBag.CurrentUser as AppUser).Id)*@
+                                @((this.ViewBag.CurrentUser as AppUser).Name)
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="@Url.Action("Index", "ToDoList")">我的待辦清單</a>
                                 <a class="dropdown-item" href="@Url.Action("Logout", "Account")">登出</a>
                             </div>
                         </li>

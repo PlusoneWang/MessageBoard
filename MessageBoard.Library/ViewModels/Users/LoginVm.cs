@@ -13,7 +13,7 @@
         /// </summary>
         [DisplayName("電子郵件")]
         [DataType(DataType.EmailAddress)]
-        [Required]
+        [Required(ErrorMessage = "請填寫電子郵件")]
         public string Email { get; set; }
 
         /// <summary>
@@ -21,7 +21,7 @@
         /// </summary>
         [DisplayName("密碼")]
         [DataType(DataType.Password)]
-        [Required]
+        [Required(ErrorMessage = "請填寫密碼")]
         public string Password { get; set; }
 
         /// <summary>

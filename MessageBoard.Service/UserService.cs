@@ -12,6 +12,24 @@
     public class UserService : BaseService
     {
         /// <summary>
+        /// 使用信箱，取得使用者
+        /// </summary>
+        /// <param name="email">使用者的信箱</param>
+        /// <returns>取得結果</returns>
+        public PoResult<User> GetUserByEmail(string email)
+        {
+            try
+            {
+                var user = this.Database.Users.FirstOrDefault(o => o.Email == email);
+                return user == null ? PoResult<User>.DbNotFound() : PoResult<User>.PoSuccess(user);
+            }
+            catch (Exception e)
+            {
+                return PoResult<User>.Exception(e);
+            }
+        }
+
+        /// <summary>
         /// 使用使用者模型物件，新增使用者
         /// </summary>
         /// <param name="userModel">使用者模型物件</param>
@@ -37,6 +55,27 @@
                 });
                 this.Database.SaveChanges();
                 return PoResult.PoSuccess();
+            }
+            catch (Exception e)
+            {
+                return PoResult.Exception(e);
+            }
+        }
+
+        /// <summary>
+        /// 使用信箱、密碼，驗證使用者
+        /// </summary>
+        /// <param name="email">信箱</param>
+        /// <param name="password">密碼</param>
+        /// <returns>驗證結果</returns>
+        public PoResult VerifyUser(string email, string password)
+        {
+            try
+            {
+                var userResult = this.GetUserByEmail(email);
+                if (!userResult.Success)
+                    return PoResult.Fail("信箱不存在");
+                return userResult.Data.Password == PasswordHash(password) ? PoResult.PoSuccess() : PoResult.Fail("密碼錯誤");
             }
             catch (Exception e)
             {

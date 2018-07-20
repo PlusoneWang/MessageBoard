@@ -51,12 +51,11 @@
             this.SignOutCurrentUser();
             if (this.ModelState.IsValid)
             {
-                // TODO verify user
-                var verifyResult = true;
-                if (verifyResult)
+                var verifyResult = this.userService.VerifyUser(loginVm.Email, loginVm.Password);
+                if (verifyResult.Success)
                 {
-                    // TODO real login
-                    IdentityTool.Authentication(this.AuthenticationManager, loginVm.RememberMe, "User");
+                    var user = this.userService.GetUserByEmail(loginVm.Email).Data;
+                    IdentityTool.Authentication(this.AuthenticationManager, loginVm.RememberMe, user.Id.ToString().ToUpper(), user.Email, user.UserName);
                     var returnUrl = this.TempData["returnUrl"]?.ToString();
                     if (returnUrl == null || !this.Url.IsLocalUrl(returnUrl))
                     {

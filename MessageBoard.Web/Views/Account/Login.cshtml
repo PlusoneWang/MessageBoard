@@ -1,2 +1,53 @@
-﻿<h1>Account/Login</h1>
+﻿@model MessageBoard.Library.ViewModels.Users.LoginVm
+@{
+    ViewBag.Title = "登入";
+}
 
+<div class="row justify-content-sm-center">
+    <div class="col-md-6">
+        <br />
+        <h2>登入</h2>
+        <hr />
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { confirm = "sweetalert" }))
+        {
+            @Html.AntiForgeryToken()
+            @* 帳號 *@
+            <div class="form-group">
+                @Html.LabelFor(model => model.Email, new { @class = "sr-only" })
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入電子郵件" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+
+            @* 密碼 *@
+            <div class="form-group">
+                @Html.LabelFor(model => model.Password, new { @class = "sr-only" })
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入密碼" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+
+            @* 記住我 *@
+            <div class="form-group form-inline">
+                <div class="col-6">
+                    <div class="row justify-content-center">
+                        <div class="form-check col-auto">
+                            @Html.CheckBoxFor(model => model.RememberMe, new { @class = "" })
+                            @Html.LabelFor(model => model.RememberMe, new { @class = "" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">沒有帳號?<a href="@Url.Action("Register")">註冊</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-outline-primary col">登入</button>
+        }
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}

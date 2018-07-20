@@ -34,10 +34,19 @@
         /// <param name="authenticationManager">The authentication manager.</param>
         /// <param name="rememberMe">if set to <c>true</c> [remember me].</param>
         /// <param name="id">The identifier.</param>
+        /// <param name="email">The email.</param>
+        /// <param name="name">The user name.</param>
         /// <param name="additionalClaim">The permissions.</param>
-        public static void Authentication(IAuthenticationManager authenticationManager, bool rememberMe, string id, params ClaimValueStruct[] additionalClaim)
+        public static void Authentication(IAuthenticationManager authenticationManager, bool rememberMe, string id, string email, string name, params ClaimValueStruct[] additionalClaim)
         {
-            var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, id) }, DefaultAuthenticationTypes.ApplicationCookie);
+            var identity = new ClaimsIdentity(
+                new[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, id),
+                        new Claim(ClaimTypes.Email, email),
+                        new Claim(ClaimTypes.Name, name),
+                    },
+                DefaultAuthenticationTypes.ApplicationCookie);
 
             if (additionalClaim != null && additionalClaim.Length > 0)
             {
@@ -70,5 +79,15 @@
         /// Id
         /// </summary>
         public string Id => this.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+        /// <summary>
+        /// Email
+        /// </summary>
+        public string Email => this.FindFirst(ClaimTypes.Email).Value;
+
+        /// <summary>
+        /// Name
+        /// </summary>
+        public string Name => this.FindFirst(ClaimTypes.Name).Value;
     }
 }
