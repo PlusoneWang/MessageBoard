@@ -1,0 +1,89 @@
+﻿@model MessageBoard.Library.ViewModels.Users.UserCreateVm
+@{
+    ViewBag.Title = "註冊";
+}
+
+<div class="row justify-content-sm-center">
+    <div class="col-md-6">
+        <br />
+        <h2>註冊</h2>
+        <hr />
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { confirm = "sweetalert", enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @* 電子郵件 *@
+            <div class="form-group">
+                @Html.LabelFor(model => model.Email, new { @class = "sr-only" })
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入電子郵件" } })
+                <small id="emailHelp" class="form-text text-muted">這個項目用於識別登入者</small>
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+
+            @* 使用者名稱 *@
+            <div class="form-group">
+                @Html.LabelFor(model => model.UserName, new { @class = "sr-only" })
+                @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入使用者名稱" } })
+                <small id="userNameHelp" class="form-text text-muted">留言時顯示的名稱</small>
+                @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+            </div>
+
+            @* 頭像 *@
+            <div class="form-group">
+                <img id="imagePreview" src="#" alt="頭像預覽" style="max-width: 200px; max-height: 200px;"/>
+                <div class="custom-file">
+                    @Html.TextBoxFor(o => o.ImageFile, new { @class = "custom-file-input", accept = "image/*", type = "file" })
+                    @Html.LabelFor(o => o.ImageFile, "選擇頭像(限制 1MB)", new { @class = "custom-file-label" })
+                </div>
+                @Html.ValidationMessageFor(model => model.ImageFile, "", new { @class = "text-danger" })
+            </div>
+
+            @* 密碼 *@
+            <div class="form-group">
+                @Html.LabelFor(model => model.Password, new { @class = "sr-only" })
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入密碼" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+
+            @* 確認密碼 *@
+            <div class="form-group">
+                @Html.LabelFor(model => model.ConfirmPassword, new { @class = "sr-only" })
+                @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control", placeholder = "請再次輸入密碼" } })
+                @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+            </div>
+
+            <button type="button" class="btn btn-outline-primary col" onclick="FormConfirm($(this).closest('form'), '因為本系統沒有取回帳號或密碼的服務，請務必牢記帳號及密碼，確定註冊?');">註冊</button>
+        }
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        function readURL(input) {
+
+            if (input.files && input.files[0]) {
+                const fileSizeInMb = input.files[0].size / 1024 / 1024;
+                if (fileSizeInMb > 1) {
+                    swal(`檔案大小超出限制\n允許的檔案大小為: 1 MB\n當前選擇的檔案大小為: ${fileSizeInMb.toFixed(4)} MB`);
+                    input.val("");
+                    return;
+                }
+
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    $('#imagePreview').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $("#ImageFile").change(function() {
+            readURL(this);
+        });
+    </script>
+}
+

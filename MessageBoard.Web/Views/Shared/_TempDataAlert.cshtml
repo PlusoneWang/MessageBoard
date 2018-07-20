@@ -1,0 +1,28 @@
+﻿@{
+    var alertMsg = TempData["alert"]?.ToString();
+    var alertMode = "default";
+
+    // ViewBag.AlertMode包含在BaseController中，於OnActionExecuting執行時設定。
+    if (ViewBag.AlertMode != null)
+    {
+        alertMode = ViewBag.AlertMode.ToString();
+    }
+}
+
+@if (!string.IsNullOrWhiteSpace(alertMsg))
+{
+    switch (alertMode)
+    {
+        case "default":
+            <script>
+                alert('@(alertMsg.Replace("\'",""))')
+            </script>
+            break;
+
+        case "sweetalert":
+            <script>
+                swal('@Html.Raw(alertMsg.Replace("\'", "").Replace("\n","<br/>"))')
+            </script>
+            break;
+    }
+}
