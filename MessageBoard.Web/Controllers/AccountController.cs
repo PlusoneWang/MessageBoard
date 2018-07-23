@@ -159,6 +159,7 @@
             return this.View(userCreateVm);
         }
 
+        [OutputCache(Duration = 180, VaryByCustom = "User")]
         public string HeadPortrait()
         {
             return this.userService.GetUser(this.CurrentUser.Id).Data.ImageBase64;
