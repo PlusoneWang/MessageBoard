@@ -20,10 +20,11 @@
                     @if (this.User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item dropdown active">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                @((this.ViewBag.CurrentUser as AppUser).Name)
+                            <a class="nav-link dropdown-toggle pt-0 pb-0" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img src="data:image/png;base64, @Html.Action("HeadPortrait","Account")" height="32" width="32" style="border-radius:50%" />
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item-text">@((this.ViewBag.CurrentUser as AppUser).Name)</a>
                                 <a class="dropdown-item" href="@Url.Action("Logout", "Account")">登出</a>
                             </div>
                         </li>

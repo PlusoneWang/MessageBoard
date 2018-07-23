@@ -1,1 +1,88 @@
-﻿<h1>Home/Index</h1>
+﻿<div class="pt-3">
+    <!-- 留言 -->
+    <div class="card">
+        <!-- body -->
+        <div class="card-body">
+            <div class="row">
+                <div class="flex-column px-2">
+                    <img src="data:image/png;base64, @Html.Action("HeadPortrait", "Account")" height="40" width="40" style="border-radius: 50%;" />
+                </div>
+                <div class="flex-fill">
+                    <textarea class="w-100" style="border: none; resize: none; overflow: hidden;" placeholder="嗨，@(User.Identity.Name)，在想些什麼?"></textarea>
+                </div>
+            </div>
+            <hr />
+            <div class="card-columns">
+                <div class="card w-auto">
+                    <div class="card-img">
+                        <img src="http://fakeimg.pl/100x100/" />
+                    </div>
+                    <div class="card-img-overlay p-0">
+                        <button type="button" class="close" aria-label="Close">
+                            <span class="align-top" aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card w-auto">
+                    <div class="card-img">
+                        <div class="btn btn-outline-light" style="position: relative; overflow: hidden; width: 100px; height: 100px; top: 0; left: 0;">
+                            <svg class="feather align-middle">
+                                <use xlink:href="~/Content/feather-sprite.svg#plus" />
+                            </svg>
+                            <input type="file" multiple accept="image/*" style="bottom: 0; cursor: pointer; height: 300px; margin: 0; opacity: 0; padding: 0; position: absolute; font-size: 1001px !important; right: 0;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- footer -->
+        <div class="card-footer">
+            <div class="row px-3">
+                <div class="flex-column">
+                    <div style="height: 38px; width: 90px;">
+                        <div class="btn btn-outline-info" style="position: fixed; overflow: hidden;">
+                            新增照片
+                            <input type="file" multiple accept="image/*" style="bottom: 0; cursor: pointer; height: 300px; margin: 0; opacity: 0; padding: 0; position: absolute; font-size: 1001px !important; right: 0;" />
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right flex-fill">
+                    <button type="button" class="btn btn-primary">留言</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    <!-- 列表 -->
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="flex-column">
+                    <img src="data:image/png;base64, @Html.Action("HeadPortrait", "Account")" height="40" width="40" style="border-radius: 50%;" />
+                    <span class="pl-2 align-middle d-inline-block" style="font-size: larger;">@User.Identity.Name</span>
+                </div>
+                <div class="text-right flex-fill">
+                    <span class="d-inline-block align-middle h-100"></span>
+                    <span class="d-inline-block align-middle" style="color: #696969;">2018-07-23 11:15</span>
+                    <a class="pl-2 card-link d-inline-block align-middle" href="#">回覆</a>
+                    <a class="card-link d-inline-block align-middle" href="#">刪除</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-text">
+                我是留言
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script src="~/Scripts/vue.js"></script>
+    <script src="~/Scripts/autosize.js"></script>
+    <script>
+        $(autosize(document.querySelectorAll('textarea')));
+    </script>
+}

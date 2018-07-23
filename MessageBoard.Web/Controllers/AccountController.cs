@@ -55,7 +55,12 @@
                 if (verifyResult.Success)
                 {
                     var user = this.userService.GetUserByEmail(loginVm.Email).Data;
-                    IdentityTool.Authentication(this.AuthenticationManager, loginVm.RememberMe, user.Id.ToString().ToUpper(), user.Email, user.UserName);
+                    IdentityTool.Authentication(
+                        this.AuthenticationManager,
+                        loginVm.RememberMe,
+                        user.Id.ToString().ToUpper(),
+                        user.Email,
+                        user.UserName);
                     var returnUrl = this.TempData["returnUrl"]?.ToString();
                     if (returnUrl == null || !this.Url.IsLocalUrl(returnUrl))
                     {
@@ -95,7 +100,6 @@
         {
             return this.View();
         }
-
 
         /// <summary>
         /// 註冊Post
@@ -153,6 +157,11 @@
             this.TempData["alert"] = result.Message.ReplaceContent();
 
             return this.View(userCreateVm);
+        }
+
+        public string HeadPortrait()
+        {
+            return this.userService.GetUser(this.CurrentUser.Id).Data.ImageBase64;
         }
     }
 }

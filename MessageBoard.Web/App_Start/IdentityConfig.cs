@@ -78,7 +78,7 @@
         /// <summary>
         /// Id
         /// </summary>
-        public string Id => this.FindFirst(ClaimTypes.NameIdentifier).Value;
+        public Guid Id => new Guid(this.FindFirst(ClaimTypes.NameIdentifier).Value);
 
         /// <summary>
         /// Email

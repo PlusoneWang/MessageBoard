@@ -12,6 +12,24 @@
     public class UserService : BaseService
     {
         /// <summary>
+        /// 使用Id，取得使用者
+        /// </summary>
+        /// <param name="userId">使用者Id</param>
+        /// <returns>取得結果</returns>
+        public PoResult<User> GetUser(Guid userId)
+        {
+            try
+            {
+                var user = this.Database.Users.Find(userId);
+                return user == null ? PoResult<User>.DbNotFound() : PoResult<User>.PoSuccess(user);
+            }
+            catch (Exception e)
+            {
+                return PoResult<User>.Exception(e);
+            }
+        }
+
+        /// <summary>
         /// 使用信箱，取得使用者
         /// </summary>
         /// <param name="email">使用者的信箱</param>
