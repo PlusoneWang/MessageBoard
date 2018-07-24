@@ -5,8 +5,11 @@
     [CreateTime]      DATETIME         CONSTRAINT [DF_Messages_CreateTime] DEFAULT (getdate()) NOT NULL,
     [ParentMessageId] UNIQUEIDENTIFIER NULL,
     CONSTRAINT [PK_Messages] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_Messages_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT [FK_Messages_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT [FK_SubMessages_Message] FOREIGN KEY ([ParentMessageId]) REFERENCES [dbo].[Messages] ([Id])
 );
+
+
 
 
 GO

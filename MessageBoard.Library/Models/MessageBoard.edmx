@@ -62,6 +62,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_SubMessages_Message">
+          <End Role="Messages" Type="Self.Messages" Multiplicity="0..1" />
+          <End Role="Messages1" Type="Self.Messages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Messages">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Messages1">
+              <PropertyRef Name="ParentMessageId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="MessageBoardModelStoreContainer">
           <EntitySet Name="AttachmentImages" EntityType="Self.AttachmentImages" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Messages" EntityType="Self.Messages" Schema="dbo" store:Type="Tables" />
@@ -73,6 +85,10 @@
           <AssociationSet Name="FK_Messages_User" Association="Self.FK_Messages_User">
             <End Role="Users" EntitySet="Users" />
             <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SubMessages_Message" Association="Self.FK_SubMessages_Message">
+            <End Role="Messages" EntitySet="Messages" />
+            <End Role="Messages1" EntitySet="Messages" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -99,6 +115,8 @@
           <Property Name="ParentMessageId" Type="Guid" />
           <NavigationProperty Name="AttachmentImages" Relationship="Self.FK_AttachmentImages_Message" FromRole="Messages" ToRole="AttachmentImages" />
           <NavigationProperty Name="User" Relationship="Self.FK_Messages_User" FromRole="Messages" ToRole="Users" />
+          <NavigationProperty Name="Messages1" Relationship="MessageBoardModel.FK_SubMessages_Message" FromRole="Message" ToRole="Message1" />
+          <NavigationProperty Name="Message1" Relationship="MessageBoardModel.FK_SubMessages_Message" FromRole="Message1" ToRole="Message" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -152,7 +170,23 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="Messages" EntitySet="Messages" />
           </AssociationSet>
+          <AssociationSet Name="FK_SubMessages_Message" Association="MessageBoardModel.FK_SubMessages_Message">
+            <End Role="Message" EntitySet="Messages" />
+            <End Role="Message1" EntitySet="Messages" />
+          </AssociationSet>
         </EntityContainer>
+        <Association Name="FK_SubMessages_Message">
+          <End Type="MessageBoardModel.Message" Role="Message" Multiplicity="0..1" />
+          <End Type="MessageBoardModel.Message" Role="Message1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Message">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message1">
+              <PropertyRef Name="ParentMessageId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->

@@ -1,24 +1,35 @@
-﻿<div class="pt-3">
+﻿@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "留言板";
+}
+<div id="app" class="pt-3">
     <!-- 留言 -->
     <div class="card">
         <!-- body -->
         <div class="card-body">
             <div class="row">
                 <div class="flex-column px-2">
-                    <img src="data:image/png;base64, @Html.Action("HeadPortrait", "Account")" height="40" width="40" style="border-radius: 50%;" />
+                    <img src="@Url.Action("HeadPortrait","Account", new {id=(ViewBag.CurrentUser as AppUser).Id})" height="40" width="40" style="border-radius: 50%;" />
                 </div>
                 <div class="flex-fill">
-                    <textarea class="w-100" style="border: none; resize: none; overflow: hidden;" placeholder="嗨，@(User.Identity.Name)，在想些什麼?"></textarea>
+                    <textarea class="w-100" style="border: none; resize: none; overflow: hidden;" placeholder="嗨，@(User.Identity.Name)，在想些什麼?" maxlength="300"
+                              v-model="currentMessage.message"></textarea>
                 </div>
             </div>
-            <hr />
-            <div class="card-columns">
-                <div class="card w-auto">
+            <hr v-if="showImageRow" />
+            <div class="card-columns"
+                 v-if="showImageRow">
+                <div class="card w-auto"
+                     v-for="(image, index) in currentMessage.previewImages">
                     <div class="card-img">
-                        <img src="http://fakeimg.pl/100x100/" />
+                        <img height="100" width="100"
+                             :src="image"
+                             :alt="currentMessage.images[index].name" />
                     </div>
-                    <div class="card-img-overlay p-0">
-                        <button type="button" class="close" aria-label="Close">
+                    <div class="card-img-overlay p-0"
+                         :title="currentMessage.images[index].name">
+                        <button type="button" class="close" aria-label="Close"
+                                @@click="removePreviewImage(index)">
                             <span class="align-top" aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -29,7 +40,8 @@
                             <svg class="feather align-middle">
                                 <use xlink:href="~/Content/feather-sprite.svg#plus" />
                             </svg>
-                            <input type="file" multiple accept="image/*" style="bottom: 0; cursor: pointer; height: 300px; margin: 0; opacity: 0; padding: 0; position: absolute; font-size: 1001px !important; right: 0;" />
+                            <input type="file" multiple accept="image/*" style="top: 0; cursor: pointer; height: 300px; margin: 0; opacity: 0; padding: 0; position: absolute; font-size: 1001px !important; right: 0;"
+                                   @@change="loadPreviewImage" />
                         </div>
                     </div>
                 </div>
@@ -43,45 +55,60 @@
                     <div style="height: 38px; width: 90px;">
                         <div class="btn btn-outline-info" style="position: relative; overflow: hidden;">
                             新增照片
-                            <input type="file" multiple accept="image/*" style="bottom: 0; cursor: pointer; height: 300px; margin: 0; opacity: 0; padding: 0; position: absolute; font-size: 1001px !important; right: 0;" />
+                            <input type="file" multiple accept="image/*" style="bottom: 0; cursor: pointer; height: 300px; margin: 0; opacity: 0; padding: 0; position: absolute; font-size: 1001px !important; right: 0;"
+                                   @@change="loadPreviewImage" />
                         </div>
                     </div>
                 </div>
                 <div class="text-right flex-fill">
-                    <button type="button" class="btn btn-primary">留言</button>
+                    <button type="button" class="btn btn-primary"
+                            v-if="messageSendable"
+                            @@click="sendMessage">
+                        留言
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <hr />
+    <hr v-if="showMessageList" />
     <!-- 列表 -->
-    <div class="card">
-        <div class="card-header">
-            <div class="row">
-                <div class="flex-column">
-                    <img src="data:image/png;base64, @Html.Action("HeadPortrait", "Account")" height="40" width="40" style="border-radius: 50%;" />
-                    <span class="pl-2 align-middle d-inline-block" style="font-size: larger;">@User.Identity.Name</span>
-                </div>
-                <div class="text-right flex-fill">
-                    <span class="d-inline-block align-middle h-100"></span>
-                    <span class="d-inline-block align-middle" style="color: #696969;">2018-07-23 11:15</span>
-                    <a class="pl-2 card-link d-inline-block align-middle" href="#">回覆</a>
-                    <a class="card-link d-inline-block align-middle" href="#">刪除</a>
+    <div v-if="showMessageList">
+        <div class="card"
+             v-for="(message,index) in messages">
+            <div class="card-header">
+                <div class="row">
+                    <div class="flex-column">
+                        <img height="40" width="40" style="border-radius: 50%;" 
+                             :src="getHeadPortrait(message.UserId)" />
+                        <span class="pl-2 align-middle d-inline-block" style="font-size: larger;">
+                            {{message.UserName}}
+                        </span>
+                    </div>
+                    <div class="text-right flex-fill">
+                        <span class="d-inline-block align-middle h-100"></span>
+                        <span class="d-inline-block align-middle" style="color: #696969;">2018-07-23 11:15</span>
+                        <a class="pl-2 card-link d-inline-block align-middle" href="#">回覆</a>
+                        <a class="card-link d-inline-block align-middle" href="#">刪除</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="card-text">
-                我是留言
+            <div class="card-body">
+                <div class="card-text">
+                    {{message.Context}}
+                </div>
             </div>
         </div>
     </div>
 </div>
 @section scripts
 {
+    <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>
     <script src="~/Scripts/vue.js"></script>
+    <script src="~/Scripts/axios.js"></script>
     <script src="~/Scripts/autosize.js"></script>
+    <script src="~/Scripts/PlusoneLib.js"></script>
+    <script src="~/Scripts/MessageBoard.js"></script>
     <script>
         $(autosize(document.querySelectorAll('textarea')));
     </script>

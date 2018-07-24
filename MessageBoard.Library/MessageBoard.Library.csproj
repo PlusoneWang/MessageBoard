@@ -74,6 +74,8 @@
       <DependentUpon>MessageBoard.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\Messages\MessageCreateModel.cs" />
+    <Compile Include="ViewModels\Messages\MessageListVm.cs" />
     <Compile Include="ViewModels\Users\LoginVm.cs" />
     <Compile Include="ViewModels\Users\UserCreateVm.cs" />
   </ItemGroup>

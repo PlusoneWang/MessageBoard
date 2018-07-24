@@ -18,6 +18,7 @@ namespace MessageBoard.Library.Models
         public Message()
         {
             this.AttachmentImages = new HashSet<AttachmentImage>();
+            this.Messages1 = new HashSet<Message>();
         }
     
         public System.Guid Id { get; set; }
@@ -29,5 +30,8 @@ namespace MessageBoard.Library.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AttachmentImage> AttachmentImages { get; set; }
         public virtual User User { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Message> Messages1 { get; set; }
+        public virtual Message Message1 { get; set; }
     }
 }

@@ -159,10 +159,16 @@
             return this.View(userCreateVm);
         }
 
-        [OutputCache(Duration = 180, VaryByCustom = "User")]
-        public string HeadPortrait()
+        /// <summary>
+        /// 取得使用者的頭像
+        /// </summary>
+        /// <param name="id">使用者id</param>
+        /// <returns>使用者的頭像</returns>
+        public FileResult HeadPortrait(string id)
         {
-            return this.userService.GetUser(this.CurrentUser.Id).Data.ImageBase64;
+            return this.File(
+                Convert.FromBase64String(this.userService.GetUser(new Guid(id)).Data.ImageBase64),
+                "image/jpeg");
         }
     }
 }
