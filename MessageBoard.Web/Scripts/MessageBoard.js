@@ -7,6 +7,7 @@
             previewImages: []
         }, // 使用者當前輸入的留言
         messages: [], // 留言列表
+        userId: window.userId
     },
 
     computed: {
@@ -137,7 +138,7 @@
                     if (data.Success !== true) {
                         swal(`${data.Message}`);
                     }
-                    this.currentMessage.images.length = 0;
+                    this.currentMessage.images = [];
                     this.currentMessage.previewImages.length = 0;
                     this.currentMessage.message = "";
                 }.bind(this))
@@ -229,8 +230,8 @@
             }
         },
 
-        authorizeUser(messageId) {
-            // TODO
+        authorizeUser(messageOwnerId) {
+            return messageOwnerId === this.userId;
         }
     }
 })

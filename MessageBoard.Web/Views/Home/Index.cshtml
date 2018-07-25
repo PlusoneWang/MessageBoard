@@ -95,7 +95,8 @@
                     <div class="text-right flex-fill">
                         <span class="d-inline-block align-middle h-100"></span>
                         <a class="card-link d-inline-block align-middle" href="#">回覆</a>
-                        <a class="card-link d-inline-block align-middle" href="#">刪除</a>
+                        <a class="card-link d-inline-block align-middle" href="#"
+                           v-if="authorizeUser(message.UserId)">刪除</a>
                     </div>
                 </div>
             </div>
@@ -103,12 +104,16 @@
                 <div class="card-text">
                     {{message.Context}}
                 </div>
+                <hr v-if="message.AttahmentList.length>0"/>
             </div>
         </div>
     </div>
 </div>
 @section scripts
 {
+    <script>
+        window.userId = "@((ViewBag.CurrentUser as AppUser).Id)";
+    </script>
     <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>
     <script src="~/Scripts/vue.js"></script>
     <script src="~/Scripts/jquery.signalR-2.3.0.js"></script>
