@@ -70,7 +70,7 @@
         </div>
     </div>
 
-    <hr v-if="showMessageList" />
+    <hr />
     <!-- 列表 -->
     <div v-if="showMessageList">
         <div class="card message"
@@ -103,16 +103,43 @@
                 <div class="card-text">
                     {{message.Context}}
                 </div>
-                <hr v-if="message.AttahmentList.length>0"/>
+                <hr v-if="message.AttahmentList.length>0" />
+                <div class="card-columns">
+                    <div class="card bg-dark text-white">
+                        <img class="card-img" src="https://fakeimg.pl/335x180/" alt="Card image" style="max-width: 350px; max-height: 350px;">
+                        <div class="card-img-overlay">
+                            <h5 class="card-title">Card title</h5>
+                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            <p class="card-text">Last updated 3 mins ago</p>
+                        </div>
+                    </div>
+                    <div class="card bg-dark text-white">
+                        <img class="card-img" src="https://fakeimg.pl/225x180/" alt="Card image" style="max-width: 350px; max-height: 350px;">
+                        <div class="card-img-overlay">
+                            <h5 class="card-title">Card title</h5>
+                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            <p class="card-text">Last updated 3 mins ago</p>
+                        </div>
+                    </div>
+                    <div class="card bg-dark text-white">
+                        <img class="card-img" src="https://fakeimg.pl/720x180/" alt="Card image" style="max-width: 350px; max-height: 350px;">
+                        <div class="card-img-overlay">
+                            <h5 class="card-title">Card title</h5>
+                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            <p class="card-text">Last updated 3 mins ago</p>
+                        </div>
+                    </div>
+                </div>
                 <!-- TODO show image -->
             </div>
         </div>
     </div>
+    <h2 class="font-weight-bold text-info text-center" v-else>這裡空空如也，成為第一個留言者吧!</h2>
 </div>
 @section scripts
 {
     <script>
-        window.serverRoot = "@Url.Content("~")";
+        const serverRoot = "@Url.Content("~")";
         const userId = "@((ViewBag.CurrentUser as AppUser).Id)";
     </script>
     <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>

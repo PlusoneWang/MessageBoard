@@ -7,7 +7,7 @@
             previewImages: []
         }, // 使用者當前輸入的留言
         messages: [], // 留言列表
-        userId: window.userId,
+        userId: userId,
         serverRoot: serverRoot
     },
 
