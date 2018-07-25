@@ -7,12 +7,17 @@
 
     using MessageBoard.Library.ViewModels.Messages;
     using MessageBoard.Service;
+    using MessageBoard.Web.Hubs;
+
+    using Microsoft.AspNet.SignalR;
 
     using Po.Result;
 
     public class HomeController : BaseController
     {
         private readonly MessageService messageService;
+
+        private readonly IHubContext hub = GlobalHost.ConnectionManager.GetHubContext<MessageHub>();
 
         public HomeController()
         {
@@ -31,7 +36,7 @@
         /// <returns>執行結果及訊息列表</returns>
         public ActionResult GetMessageList(List<Guid> excludeMessages = null)
         {
-            var getResult = this.messageService.GetMessageListVm(excludeMessages ?? new List<Guid>(), 3);
+            var getResult = this.messageService.GetMessageListVmList(excludeMessages ?? new List<Guid>(), 3);
             return this.Json(getResult, JsonRequestBehavior.AllowGet);
         }
 
@@ -44,9 +49,19 @@
         [HttpPost]
         public ActionResult SendMessage(string messageContext, HttpPostedFileBase[] images)
         {
+            // 驗證
             if (messageContext.Length > 300)
+            {
                 return this.Json(PoResult.Fail("訊息內容超出限制，最多為300字"));
+            }
 
+            // 驗證
+            if (messageContext.Length == 0 && images == null)
+            {
+                return this.Json(PoResult.Fail("沒有可以儲存的訊息內容"));
+            }
+
+            // 組裝model
             var messageCreateModel = new MessageCreateModel
             {
                 UserId = this.CurrentUser.Id,
@@ -55,6 +70,7 @@
             };
 
             if (images != null)
+            {
                 foreach (var image in images)
                 {
                     if (image == null || image.ContentLength == 0)
@@ -84,11 +100,19 @@
                     var readBytes = binaryReader.ReadBytes((int)image.InputStream.Length);
                     messageCreateModel.ImageBase64List.Add(Convert.ToBase64String(readBytes));
                 }
+            }
 
             var saveResult = this.messageService.SaveMessage(messageCreateModel);
+            if (saveResult.Success)
+            {
+                var messageListVmResult = this.messageService.GetMessageListVm(saveResult.Data.Id);
+                if (messageListVmResult.Success)
+                {
+                    this.hub.Clients.All.updateMessage(messageListVmResult.Data.MessageId, "newMessage", messageListVmResult.Data);
+                }
+            }
 
-            // TODO update all client via signalr
-            return this.Json(saveResult);
+            return this.Json(new PoResult { Success = saveResult.Success, Message = saveResult.Message });
         }
     }
 }

@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.Entity;
+    using System.Data.Entity.SqlServer;
     using System.Linq;
 
     using MessageBoard.Library.Models;
@@ -20,7 +22,7 @@
         /// <param name="excludeMessages">要排除的訊息的Id清單</param>
         /// <param name="count">要取得的訊息數量</param>
         /// <returns>取得結果</returns>
-        public PoResult<List<MessageListVm>> GetMessageListVm(List<Guid> excludeMessages, int count)
+        public PoResult<List<MessageListVm>> GetMessageListVmList(List<Guid> excludeMessages, int count)
         {
             if (count < 0) count = 0;
             try
@@ -36,7 +38,7 @@
                         UserName = message.User.UserName,
                         MessageId = message.Id,
                         Context = message.Context,
-                        Time = message.CreateTime,
+                        Time = $"{message.CreateTime: yyyy-MM-dd HH:mm:ss}",
                         AttahmentList =
                                                     message.AttachmentImages.Select(
                                                         o => new Attahment
@@ -48,13 +50,14 @@
                             this.Database.Messages
                                 .Where(o => o.ParentMessageId != null && o.ParentMessageId.Value == message.Id)
                                 .OrderByDescending(o => o.CreateTime)
+                                .AsEnumerable()
                                 .Select(o => new MessageListVm
                                 {
                                     UserId = o.UserId,
                                     UserName = o.User.UserName,
                                     MessageId = o.Id,
                                     Context = o.Context,
-                                    Time = o.CreateTime,
+                                    Time = $"{o.CreateTime: yyyy-MM-dd HH:mm:ss}",
                                     AttahmentList =
                                         o.AttachmentImages.Select(
                                             c => new Attahment
@@ -78,17 +81,77 @@
         }
 
         /// <summary>
-        /// 使用Message物件，新增訊息
+        /// 使用訊息Id，取得MessageListVm
+        /// </summary>
+        /// <param name="messageId">訊息Id</param>
+        /// <returns>取得結果</returns>
+        public PoResult<MessageListVm> GetMessageListVm(Guid messageId)
+        {
+            try
+            {
+                var message = this.Database.Messages.Include(o => o.User).FirstOrDefault(o => o.Id == messageId);
+                if (message == null)
+                {
+                    return PoResult<MessageListVm>.DbNotFound();
+                }
+
+                var messageListVm = new MessageListVm
+                {
+                    UserId = message.UserId,
+                    UserName = message.User.UserName,
+                    MessageId = message.Id,
+                    Context = message.Context,
+                    Time = $"{message.CreateTime: yyyy-MM-dd HH:mm:ss}",
+                    AttahmentList =
+                                                    message.AttachmentImages.Select(
+                                                        o => new Attahment
+                                                        {
+                                                            ImageId = o.Id,
+                                                            ImageBase64 = o.ImageBase64
+                                                        }).ToList(),
+                    ReplyMessages =
+                            this.Database.Messages
+                                .Where(o => o.ParentMessageId != null && o.ParentMessageId.Value == message.Id)
+                                .OrderByDescending(o => o.CreateTime)
+                                .AsEnumerable()
+                                .Select(o => new MessageListVm
+                                {
+                                    UserId = o.UserId,
+                                    UserName = o.User.UserName,
+                                    MessageId = o.Id,
+                                    Context = o.Context,
+                                    Time = $"{o.CreateTime: yyyy-MM-dd HH:mm:ss}",
+                                    AttahmentList =
+                                        o.AttachmentImages.Select(
+                                            c => new Attahment
+                                            {
+                                                ImageId = c.Id,
+                                                ImageBase64 = c.ImageBase64
+                                            }).ToList(),
+                                })
+                                .ToList()
+                };
+
+                return PoResult<MessageListVm>.PoSuccess(messageListVm);
+            }
+            catch (Exception e)
+            {
+                return PoResult<MessageListVm>.Exception(e);
+            }
+        }
+
+        /// <summary>
+        /// 使用MessageCreate物件，新增訊息，並回傳建立的訊息
         /// </summary>
         /// <param name="newMessage">Message物件</param>
         /// <returns>新增結果</returns>
-        public PoResult SaveMessage(MessageCreateModel newMessage)
+        public PoResult<Message> SaveMessage(MessageCreateModel newMessage)
         {
             try
             {
                 if (newMessage.ParentMessageId != null && this.Database.Messages.All(o => o.Id != newMessage.ParentMessageId.Value))
                 {
-                    return PoResult.Fail("找不到訊息的回覆目標");
+                    return PoResult<Message>.Fail("找不到訊息的回覆目標");
                 }
 
                 var message = new Message
@@ -97,10 +160,10 @@
                     UserId = newMessage.UserId,
                     Context = newMessage.Context,
                     CreateTime = DateTime.Now,
-                    ParentMessageId = newMessage.ParentMessageId
+                    ParentMessageId = newMessage.ParentMessageId,
+                    AttachmentImages = new List<AttachmentImage>()
                 };
 
-                message.AttachmentImages = new List<AttachmentImage>();
                 foreach (var imageBase64 in newMessage.ImageBase64List)
                 {
                     message.AttachmentImages.Add(new AttachmentImage
@@ -112,11 +175,11 @@
                 }
                 this.Database.Messages.Add(message);
                 this.Database.SaveChanges();
-                return PoResult.PoSuccess();
+                return PoResult<Message>.PoSuccess(message);
             }
             catch (Exception e)
             {
-                return PoResult.Exception(e);
+                return PoResult<Message>.Exception(e);
             }
         }
     }

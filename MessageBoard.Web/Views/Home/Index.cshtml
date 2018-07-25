@@ -74,21 +74,27 @@
     <hr v-if="showMessageList" />
     <!-- 列表 -->
     <div v-if="showMessageList">
-        <div class="card"
+        <div class="card message"
              v-for="(message,index) in messages">
-            <div class="card-header">
+            <div class="card-header py-1">
                 <div class="row">
                     <div class="flex-column">
-                        <img height="40" width="40" style="border-radius: 50%;" 
-                             :src="getHeadPortraitUrl(message.UserId)" />
-                        <span class="pl-2 align-middle d-inline-block" style="font-size: larger;">
-                            {{message.UserName}}
-                        </span>
+                        <div class="row mx-0">
+                            <div class="flex-column">
+                                <img class="mt-1" height="40" width="40" style="border-radius: 50%; top: 0;"
+                                     :src="getHeadPortraitUrl(message.UserId)" />
+                            </div>
+                            <div class="flex-fill pl-2">
+                                <span class="d-block" style="font-size: larger;">
+                                    {{message.UserName}}
+                                </span>
+                                <span class="d-block" style="color: #696969; font-size: small;">{{message.Time}}</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="text-right flex-fill">
                         <span class="d-inline-block align-middle h-100"></span>
-                        <span class="d-inline-block align-middle" style="color: #696969;">2018-07-23 11:15</span>
-                        <a class="pl-2 card-link d-inline-block align-middle" href="#">回覆</a>
+                        <a class="card-link d-inline-block align-middle" href="#">回覆</a>
                         <a class="card-link d-inline-block align-middle" href="#">刪除</a>
                     </div>
                 </div>
@@ -105,6 +111,8 @@
 {
     <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>
     <script src="~/Scripts/vue.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.3.0.js"></script>
+    <script src="/signalr/hubs"></script>
     <script src="~/Scripts/axios.js"></script>
     <script src="~/Scripts/autosize.js"></script>
     <script src="~/Scripts/PlusoneLib.js"></script>

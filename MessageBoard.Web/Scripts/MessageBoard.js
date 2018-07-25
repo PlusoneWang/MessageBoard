@@ -43,6 +43,9 @@
 
     created() {
         this.loadMoreMessages();
+        var messageHub = $.connection.messageHub;
+        messageHub.client.updateMessage = this.updateMessage;
+        $.connection.hub.start();
     },
 
     methods: {
@@ -156,8 +159,78 @@
             // TODO delete message
         },
 
-        updateMessage() {
-            // TODO update message via signalR
+        /**
+         * 更新訊息
+         * @param {any} targetId 目標訊息Id
+         * @param {any} updateType 動作類型
+         * @param {any} data 新資料
+         */
+        updateMessage(targetId, updateType, data) {
+            switch (updateType) {
+                case "newMessage":
+                    {
+                        // insert new message
+                        this.messages.splice(0, 0, data);
+                        break;
+                    }
+                case "newReply":
+                    {
+                        // insert new reply to target message
+                        const message = this.messages.find((element) => { return element.MessageId === targetId });
+                        if (message) {
+                            message.ReplyMessages.splice(0, 0, data);
+                        }
+                        break;
+                    }
+                case "updateMessage":
+                    {
+                        // replace target message
+                        for (let i = 0; i < this.messages.length; i++) {
+                            if (this.messages[i].MessageId === targetId) {
+                                const replyMessages = JSON.parse(JSON.stringify(this.messages[i].ReplyMessages));
+                                data.ReplyMessages = replyMessages;
+                                this.messages.splice(i, 1, data);
+                                break;
+                            }
+                            else if (this.messages[i].ReplyMessages.length > 0) {
+                                for (let j = 0; j < this.messages[i].ReplyMessages.length; j++) {
+                                    if (this.messages[i].ReplyMessages[j].MessageId === targetId) {
+                                        this.messages[i].ReplyMessages[j].splice(j, 1, data);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                case "delete":
+                    {
+                        // remove target message
+                        for (let i = 0; i < this.messages.length; i++) {
+                            if (this.messages[i].MessageId === targetId) {
+                                this.messages.splice(i, 1);
+                                break;
+                            }
+                            else if (this.messages[i].ReplyMessages.length > 0) {
+                                for (let j = 0; j < this.messages[i].ReplyMessages.length; j++) {
+                                    if (this.messages[i].ReplyMessages[j].MessageId === targetId) {
+                                        this.messages[i].ReplyMessages[j].splice(j, 1);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        console.warn("未預期的動作類型");
+                    }
+            }
+        },
+
+        authorizeUser(messageId) {
+            // TODO
         }
     }
 })

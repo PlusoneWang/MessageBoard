@@ -36,7 +36,7 @@
         /// <summary>
         /// 留言時間
         /// </summary>
-        public DateTime Time { get; set; }
+        public string Time { get; set; }
 
         /// <summary>
         /// 回覆訊息

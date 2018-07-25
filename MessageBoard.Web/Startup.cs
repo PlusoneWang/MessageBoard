@@ -10,6 +10,9 @@ namespace MessageBoard.Web
         public void Configuration(IAppBuilder app)
         {
             this.ConfigureAuth(app);
+
+            // Configure SignalR
+            app.MapSignalR();
         }
     }
 }
