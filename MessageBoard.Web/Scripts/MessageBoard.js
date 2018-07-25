@@ -10,16 +10,17 @@
     },
 
     computed: {
-        // 表示是否要顯示留言框的圖片群組
+        // 是否要顯示留言框的圖片群組
         showImageRow() {
             return Array.isArray(this.currentMessage.images) && this.currentMessage.images.length > 0;
         },
 
+        // 是否顯顯示訊息列表
         showMessageList() {
             return this.messages.length > 0;
         },
 
-        // 表示是否可以送出訊息
+        // 是否可以送出訊息
         messageSendable() {
             return this.currentMessage.message.length > 0 || this.showImageRow;
         },
@@ -31,6 +32,7 @@
     },
 
     watch: {
+        // 這是多餘的驗證，除非textarea的maxlength屬性失效，否則不會觸發這個alert
         "currentMessage.message": function (newMessage, oldMessage) {
             if (newMessage.length > 300) {
                 swal("留言字數上限為300字");
@@ -41,7 +43,6 @@
 
     created() {
         this.loadMoreMessages();
-        // TODO get messages from api
     },
 
     methods: {
@@ -103,7 +104,8 @@
             this.currentMessage.previewImages.splice(index, 1);
         },
 
-        getHeadPortrait(userId) {
+        // 取得頭像url
+        getHeadPortraitUrl(userId) {
             return Router.action('Account', 'HeadPortrait', { id: userId });
         },
 
