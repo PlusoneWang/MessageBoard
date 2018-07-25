@@ -16,7 +16,8 @@ namespace MessageBoard.Library.Models
     {
         public System.Guid Id { get; set; }
         public System.Guid MessageId { get; set; }
-        public string ImageBase64 { get; set; }
+        public string Path { get; set; }
+        public string FileName { get; set; }
     
         public virtual Message Message { get; set; }
     }

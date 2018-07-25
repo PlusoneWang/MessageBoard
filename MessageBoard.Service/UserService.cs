@@ -69,7 +69,7 @@
                     UserName = userModel.UserName,
                     Password = PasswordHash(userModel.Password),
                     CreateTime = DateTime.Now,
-                    ImageBase64 = userModel.ImageBase64
+                    HeadPortraitPath = userModel.ImagePath
                 });
                 this.Database.SaveChanges();
                 return PoResult.PoSuccess();

@@ -19,9 +19,9 @@
         public string Context { get; set; }
 
         /// <summary>
-        /// 附件圖片的Base64字串
+        /// 附件圖片的Base64字串及原始檔名
         /// </summary>
-        public List<string> ImageBase64List { get; set; } = new List<string>();
+        public List<(string Name, string Path)> Images { get; set; } = new List<(string Name, string Path)>();
 
         /// <summary>
         /// 父階留言Id

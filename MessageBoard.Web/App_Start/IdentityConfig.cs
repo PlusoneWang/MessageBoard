@@ -4,6 +4,8 @@
     using System.Security.Claims;
     using System.Security.Principal;
 
+    using MessageBoard.Library.Enums;
+
     using Microsoft.AspNet.Identity;
     using Microsoft.Owin.Security;
 
@@ -89,5 +91,10 @@
         /// Name
         /// </summary>
         public string Name => this.FindFirst(ClaimTypes.Name).Value;
+
+        /// <summary>
+        /// 頭像路徑
+        /// </summary>
+        public string HeadPortraitPath => this.FindFirst(IdentityFields.HeadPortraitPath.ToString()).Value;
     }
 }

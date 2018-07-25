@@ -30,9 +30,9 @@
         public string ImageFile { get; set; }
 
         /// <summary>
-        /// 頭像的Base64字串
+        /// 頭像檔案路徑
         /// </summary>
-        public string ImageBase64 { get; set; }
+        public string ImagePath { get; set; }
 
         /// <summary>
         /// 密碼

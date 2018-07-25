@@ -4,6 +4,9 @@
     using System.Web;
     using System.Web.Mvc;
 
+    using Ci.Upload.Extensions;
+
+    using MessageBoard.Library.Enums;
     using MessageBoard.Library.ViewModels.Users;
     using MessageBoard.Service;
 
@@ -44,10 +47,16 @@
             return this.View();
         }
 
+        /// <summary>
+        /// 登入POST
+        /// </summary>
+        /// <param name="loginVm">login view model</param>
+        /// <returns>登入結果</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginVm loginVm)
         {
+            // 登出當前使用者 if needed
             this.SignOutCurrentUser();
             if (this.ModelState.IsValid)
             {
@@ -60,7 +69,8 @@
                         loginVm.RememberMe,
                         user.Id.ToString().ToUpper(),
                         user.Email,
-                        user.UserName);
+                        user.UserName,
+                        new ClaimValueStruct { Field = IdentityFields.HeadPortraitPath.ToString(), Value = this.Url.Content(user.HeadPortraitPath) });
                     var returnUrl = this.TempData["returnUrl"]?.ToString();
                     if (returnUrl == null || !this.Url.IsLocalUrl(returnUrl))
                     {
@@ -143,9 +153,9 @@
             }
 
             imageFile.InputStream.Position = 0;
-            var binaryReader = new System.IO.BinaryReader(imageFile.InputStream);
-            var readBytes = binaryReader.ReadBytes((int)imageFile.InputStream.Length);
-            userCreateVm.ImageBase64 = Convert.ToBase64String(readBytes);
+            var saveResult = imageFile.SaveAsLocal("HeadPortraits");
+
+            userCreateVm.ImagePath = saveResult.VirtualPath;
 
             var result = this.userService.CreateUser(userCreateVm);
             if (result.Success)
@@ -154,21 +164,15 @@
                 return this.RedirectToAction("Login");
             }
 
+            var mapPath = this.Server.MapPath(saveResult.VirtualPath);
+            if (System.IO.File.Exists(mapPath))
+            {
+                System.IO.File.Delete(mapPath);
+            }
+
             this.TempData["alert"] = result.Message.ReplaceContent();
 
             return this.View(userCreateVm);
-        }
-
-        /// <summary>
-        /// 取得使用者的頭像
-        /// </summary>
-        /// <param name="id">使用者id</param>
-        /// <returns>使用者的頭像</returns>
-        public FileResult HeadPortrait(string id)
-        {
-            return this.File(
-                Convert.FromBase64String(this.userService.GetUser(new Guid(id)).Data.ImageBase64),
-                "image/jpeg");
         }
     }
 }

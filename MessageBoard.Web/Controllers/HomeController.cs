@@ -2,8 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using System.Web;
     using System.Web.Mvc;
+
+    using Ci.Upload.Extensions;
 
     using MessageBoard.Library.ViewModels.Messages;
     using MessageBoard.Service;
@@ -96,9 +99,12 @@
                     }
 
                     image.InputStream.Position = 0;
-                    var binaryReader = new System.IO.BinaryReader(image.InputStream);
-                    var readBytes = binaryReader.ReadBytes((int)image.InputStream.Length);
-                    messageCreateModel.ImageBase64List.Add(Convert.ToBase64String(readBytes));
+                }
+
+                foreach (var image in images)
+                {
+                    var fileResult = image.SaveAsLocal("AttachmentImages");
+                    messageCreateModel.Images.Add(($"{fileResult.OriName}{fileResult.Extension}", fileResult.VirtualPath));
                 }
             }
 
@@ -109,6 +115,17 @@
                 if (messageListVmResult.Success)
                 {
                     this.hub.Clients.All.updateMessage(messageListVmResult.Data.MessageId, "newMessage", messageListVmResult.Data);
+                }
+            }
+            else
+            {
+                foreach (var image in messageCreateModel.Images)
+                {
+                    var mapPath = this.Server.MapPath(image.Path);
+                    if (System.IO.File.Exists(mapPath))
+                    {
+                        System.IO.File.Delete(mapPath);
+                    }
                 }
             }
 

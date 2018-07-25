@@ -1,12 +1,14 @@
 ﻿CREATE TABLE [dbo].[Users] (
-    [Id]          UNIQUEIDENTIFIER CONSTRAINT [DF_Users_Id] DEFAULT (newsequentialid()) NOT NULL,
-    [Email]       VARCHAR (200)    NOT NULL,
-    [UserName]    NVARCHAR (50)    NOT NULL,
-    [Password]    CHAR (44)        NOT NULL,
-    [ImageBase64] NVARCHAR (MAX)   NOT NULL,
-    [CreateTime]  DATETIME         CONSTRAINT [DF_Users_CreateTime] DEFAULT (getdate()) NOT NULL,
+    [Id]               UNIQUEIDENTIFIER CONSTRAINT [DF_Users_Id] DEFAULT (newsequentialid()) NOT NULL,
+    [Email]            VARCHAR (200)    NOT NULL,
+    [UserName]         NVARCHAR (50)    NOT NULL,
+    [Password]         CHAR (44)        NOT NULL,
+    [HeadPortraitPath] NVARCHAR (200)   NOT NULL,
+    [CreateTime]       DATETIME         CONSTRAINT [DF_Users_CreateTime] DEFAULT (getdate()) NOT NULL,
     CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 
@@ -32,9 +34,13 @@ EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'密碼', @l
 
 
 GO
-EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'頭像Base64', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'Users', @level2type = N'COLUMN', @level2name = N'ImageBase64';
+
 
 
 GO
 EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'建立時間', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'Users', @level2type = N'COLUMN', @level2name = N'CreateTime';
+
+
+GO
+EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'頭像路徑', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'Users', @level2type = N'COLUMN', @level2name = N'HeadPortraitPath';
 

@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
-    using System.Data.Entity.SqlServer;
     using System.Linq;
 
     using MessageBoard.Library.Models;
@@ -36,6 +35,7 @@
                     {
                         UserId = message.UserId,
                         UserName = message.User.UserName,
+                        HeadPortraitPath = message.User.HeadPortraitPath,
                         MessageId = message.Id,
                         Context = message.Context,
                         Time = $"{message.CreateTime: yyyy-MM-dd HH:mm:ss}",
@@ -44,7 +44,8 @@
                                                         o => new Attahment
                                                         {
                                                             ImageId = o.Id,
-                                                            ImageBase64 = o.ImageBase64
+                                                            Name = o.FileName,
+                                                            ImagePath = o.Path,
                                                         }).ToList(),
                         ReplyMessages =
                             this.Database.Messages
@@ -55,6 +56,7 @@
                                 {
                                     UserId = o.UserId,
                                     UserName = o.User.UserName,
+                                    HeadPortraitPath = o.User.HeadPortraitPath,
                                     MessageId = o.Id,
                                     Context = o.Context,
                                     Time = $"{o.CreateTime: yyyy-MM-dd HH:mm:ss}",
@@ -63,7 +65,8 @@
                                             c => new Attahment
                                             {
                                                 ImageId = c.Id,
-                                                ImageBase64 = c.ImageBase64
+                                                Name = c.FileName,
+                                                ImagePath = c.Path
                                             }).ToList(),
                                 })
                                 .ToList()
@@ -99,6 +102,7 @@
                 {
                     UserId = message.UserId,
                     UserName = message.User.UserName,
+                    HeadPortraitPath = message.User.HeadPortraitPath,
                     MessageId = message.Id,
                     Context = message.Context,
                     Time = $"{message.CreateTime: yyyy-MM-dd HH:mm:ss}",
@@ -107,7 +111,8 @@
                                                         o => new Attahment
                                                         {
                                                             ImageId = o.Id,
-                                                            ImageBase64 = o.ImageBase64
+                                                            Name = o.FileName,
+                                                            ImagePath = o.Path
                                                         }).ToList(),
                     ReplyMessages =
                             this.Database.Messages
@@ -118,6 +123,7 @@
                                 {
                                     UserId = o.UserId,
                                     UserName = o.User.UserName,
+
                                     MessageId = o.Id,
                                     Context = o.Context,
                                     Time = $"{o.CreateTime: yyyy-MM-dd HH:mm:ss}",
@@ -126,7 +132,8 @@
                                             c => new Attahment
                                             {
                                                 ImageId = c.Id,
-                                                ImageBase64 = c.ImageBase64
+                                                Name = c.FileName,
+                                                ImagePath = c.Path
                                             }).ToList(),
                                 })
                                 .ToList()
@@ -164,13 +171,14 @@
                     AttachmentImages = new List<AttachmentImage>()
                 };
 
-                foreach (var imageBase64 in newMessage.ImageBase64List)
+                foreach (var image in newMessage.Images)
                 {
                     message.AttachmentImages.Add(new AttachmentImage
                     {
                         Id = Ci.Sequential.Guid.Create(),
                         MessageId = message.Id,
-                        ImageBase64 = imageBase64
+                        Path = image.Path,
+                        FileName = image.Name
                     });
                 }
                 this.Database.Messages.Add(message);

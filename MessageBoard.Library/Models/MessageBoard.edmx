@@ -11,7 +11,8 @@
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MessageId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ImageBase64" Type="varchar(max)" Nullable="false" />
+          <Property Name="Path" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="FileName" Type="nvarchar" MaxLength="260" Nullable="false" />
         </EntityType>
         <EntityType Name="Messages">
           <Key>
@@ -31,7 +32,7 @@
           <Property Name="Email" Type="varchar" MaxLength="200" Nullable="false" />
           <Property Name="UserName" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Password" Type="char" MaxLength="44" Nullable="false" />
-          <Property Name="ImageBase64" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="HeadPortraitPath" Type="nvarchar" MaxLength="200" Nullable="false" />
           <Property Name="CreateTime" Type="datetime" Nullable="false" />
         </EntityType>
         <Association Name="FK_AttachmentImages_Message">
@@ -95,14 +96,32 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="MessageBoardModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="MessageBoardEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AttachmentImages" EntityType="MessageBoardModel.AttachmentImage" />
+          <EntitySet Name="Messages" EntityType="MessageBoardModel.Message" />
+          <EntitySet Name="Users" EntityType="MessageBoardModel.User" />
+          <AssociationSet Name="FK_AttachmentImages_Message" Association="MessageBoardModel.FK_AttachmentImages_Message">
+            <End Role="Message" EntitySet="Messages" />
+            <End Role="AttachmentImage" EntitySet="AttachmentImages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Messages_User" Association="MessageBoardModel.FK_Messages_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Message" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SubMessages_Message" Association="MessageBoardModel.FK_SubMessages_Message">
+            <End Role="Message" EntitySet="Messages" />
+            <End Role="Message1" EntitySet="Messages" />
+          </AssociationSet>
+        </EntityContainer>
         <EntityType Name="AttachmentImage">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="MessageId" Type="Guid" Nullable="false" />
-          <Property Name="ImageBase64" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Message" Relationship="Self.FK_AttachmentImages_Message" FromRole="AttachmentImages" ToRole="Messages" />
+          <Property Name="Path" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="FileName" Type="String" Nullable="false" MaxLength="260" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Message" Relationship="MessageBoardModel.FK_AttachmentImages_Message" FromRole="AttachmentImage" ToRole="Message" />
         </EntityType>
         <EntityType Name="Message">
           <Key>
@@ -113,8 +132,8 @@
           <Property Name="Context" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
           <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ParentMessageId" Type="Guid" />
-          <NavigationProperty Name="AttachmentImages" Relationship="Self.FK_AttachmentImages_Message" FromRole="Messages" ToRole="AttachmentImages" />
-          <NavigationProperty Name="User" Relationship="Self.FK_Messages_User" FromRole="Messages" ToRole="Users" />
+          <NavigationProperty Name="AttachmentImages" Relationship="MessageBoardModel.FK_AttachmentImages_Message" FromRole="Message" ToRole="AttachmentImage" />
+          <NavigationProperty Name="User" Relationship="MessageBoardModel.FK_Messages_User" FromRole="Message" ToRole="User" />
           <NavigationProperty Name="Messages1" Relationship="MessageBoardModel.FK_SubMessages_Message" FromRole="Message" ToRole="Message1" />
           <NavigationProperty Name="Message1" Relationship="MessageBoardModel.FK_SubMessages_Message" FromRole="Message1" ToRole="Message" />
         </EntityType>
@@ -123,58 +142,41 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="Email" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="UserName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Password" Type="String" MaxLength="44" FixedLength="true" Unicode="false" Nullable="false" />
-          <Property Name="ImageBase64" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Messages" Relationship="Self.FK_Messages_User" FromRole="Users" ToRole="Messages" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="44" FixedLength="true" Unicode="false" />
+          <Property Name="HeadPortraitPath" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Messages" Relationship="MessageBoardModel.FK_Messages_User" FromRole="User" ToRole="Message" />
         </EntityType>
         <Association Name="FK_AttachmentImages_Message">
-          <End Role="Messages" Type="Self.Message" Multiplicity="1">
+          <End Type="MessageBoardModel.Message" Role="Message" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="AttachmentImages" Type="Self.AttachmentImage" Multiplicity="*" />
+          <End Type="MessageBoardModel.AttachmentImage" Role="AttachmentImage" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Messages">
+            <Principal Role="Message">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="AttachmentImages">
+            <Dependent Role="AttachmentImage">
               <PropertyRef Name="MessageId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Messages_User">
-          <End Role="Users" Type="Self.User" Multiplicity="1">
+          <End Type="MessageBoardModel.User" Role="User" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="Messages" Type="Self.Message" Multiplicity="*" />
+          <End Type="MessageBoardModel.Message" Role="Message" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Users">
+            <Principal Role="User">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Messages">
+            <Dependent Role="Message">
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="MessageBoardEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="AttachmentImages" EntityType="Self.AttachmentImage" />
-          <EntitySet Name="Messages" EntityType="Self.Message" />
-          <EntitySet Name="Users" EntityType="Self.User" />
-          <AssociationSet Name="FK_AttachmentImages_Message" Association="Self.FK_AttachmentImages_Message">
-            <End Role="Messages" EntitySet="Messages" />
-            <End Role="AttachmentImages" EntitySet="AttachmentImages" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Messages_User" Association="Self.FK_Messages_User">
-            <End Role="Users" EntitySet="Users" />
-            <End Role="Messages" EntitySet="Messages" />
-          </AssociationSet>
-          <AssociationSet Name="FK_SubMessages_Message" Association="MessageBoardModel.FK_SubMessages_Message">
-            <End Role="Message" EntitySet="Messages" />
-            <End Role="Message1" EntitySet="Messages" />
-          </AssociationSet>
-        </EntityContainer>
         <Association Name="FK_SubMessages_Message">
           <End Type="MessageBoardModel.Message" Role="Message" Multiplicity="0..1" />
           <End Type="MessageBoardModel.Message" Role="Message1" Multiplicity="*" />
@@ -187,7 +189,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -196,20 +198,21 @@
           <EntitySetMapping Name="AttachmentImages">
             <EntityTypeMapping TypeName="MessageBoardModel.AttachmentImage">
               <MappingFragment StoreEntitySet="AttachmentImages">
-                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="Path" ColumnName="Path" />
                 <ScalarProperty Name="MessageId" ColumnName="MessageId" />
-                <ScalarProperty Name="ImageBase64" ColumnName="ImageBase64" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Messages">
             <EntityTypeMapping TypeName="MessageBoardModel.Message">
               <MappingFragment StoreEntitySet="Messages">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="Context" ColumnName="Context" />
-                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
                 <ScalarProperty Name="ParentMessageId" ColumnName="ParentMessageId" />
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="Context" ColumnName="Context" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -217,11 +220,11 @@
             <EntityTypeMapping TypeName="MessageBoardModel.User">
               <MappingFragment StoreEntitySet="Users">
                 <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="HeadPortraitPath" ColumnName="HeadPortraitPath" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
-                <ScalarProperty Name="ImageBase64" ColumnName="ImageBase64" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

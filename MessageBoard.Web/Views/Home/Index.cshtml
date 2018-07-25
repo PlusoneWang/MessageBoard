@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNet.Identity
-@{
+﻿@{
     ViewBag.Title = "留言板";
 }
 <div id="app" class="pt-3">
@@ -9,7 +8,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="flex-column px-2">
-                    <img src="@Url.Action("HeadPortrait","Account", new {id=(ViewBag.CurrentUser as AppUser).Id})" height="40" width="40" style="border-radius: 50%;" />
+                    <img src="@((ViewBag.CurrentUser as AppUser).HeadPortraitPath)" height="40" width="40" style="border-radius: 50%;" />
                 </div>
                 <div class="flex-fill">
                     <textarea class="w-100" style="border: none; resize: none; overflow: hidden;" placeholder="嗨，@(User.Identity.Name)，在想些什麼?" maxlength="300"
@@ -82,7 +81,7 @@
                         <div class="row mx-0">
                             <div class="flex-column">
                                 <img class="mt-1" height="40" width="40" style="border-radius: 50%; top: 0;"
-                                     :src="getHeadPortraitUrl(message.UserId)" />
+                                     :src="resolveUrl(message.HeadPortraitPath)" />
                             </div>
                             <div class="flex-fill pl-2">
                                 <span class="d-block" style="font-size: larger;">
@@ -105,6 +104,7 @@
                     {{message.Context}}
                 </div>
                 <hr v-if="message.AttahmentList.length>0"/>
+                <!-- TODO show image -->
             </div>
         </div>
     </div>
@@ -112,7 +112,8 @@
 @section scripts
 {
     <script>
-        window.userId = "@((ViewBag.CurrentUser as AppUser).Id)";
+        window.serverRoot = "@Url.Content("~")";
+        const userId = "@((ViewBag.CurrentUser as AppUser).Id)";
     </script>
     <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>
     <script src="~/Scripts/vue.js"></script>

@@ -1,10 +1,15 @@
 ﻿CREATE TABLE [dbo].[AttachmentImages] (
-    [Id]          UNIQUEIDENTIFIER CONSTRAINT [DF_AttachmentImages_Id] DEFAULT (newsequentialid()) NOT NULL,
-    [MessageId]   UNIQUEIDENTIFIER NOT NULL,
-    [ImageBase64] VARCHAR (MAX)    NOT NULL,
+    [Id]        UNIQUEIDENTIFIER CONSTRAINT [DF_AttachmentImages_Id] DEFAULT (newsequentialid()) NOT NULL,
+    [MessageId] UNIQUEIDENTIFIER NOT NULL,
+    [Path]      NVARCHAR (200)   NOT NULL,
+    [FileName]  NVARCHAR (260)   NOT NULL,
     CONSTRAINT [PK_AttachmentImages] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_AttachmentImages_Message] FOREIGN KEY ([MessageId]) REFERENCES [dbo].[Messages] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+
+
 
 
 GO
@@ -20,5 +25,9 @@ EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'留言Id', 
 
 
 GO
-EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'圖片', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'AttachmentImages', @level2type = N'COLUMN', @level2name = N'ImageBase64';
+EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'圖片路徑', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'AttachmentImages', @level2type = N'COLUMN', @level2name = N'Path';
+
+
+GO
+EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'檔案名稱', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'AttachmentImages', @level2type = N'COLUMN', @level2name = N'FileName';
 

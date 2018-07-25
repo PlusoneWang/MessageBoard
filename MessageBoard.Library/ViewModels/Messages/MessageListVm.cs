@@ -19,6 +19,11 @@
         public string UserName { get; set; }
 
         /// <summary>
+        /// 頭像路徑
+        /// </summary>
+        public string HeadPortraitPath { get; set; }
+
+        /// <summary>
         /// 訊息Id
         /// </summary>
         public Guid MessageId { get; set; }
@@ -55,8 +60,13 @@
         public Guid ImageId { get; set; }
 
         /// <summary>
-        /// 圖片的Base64字串
+        /// 圖片路徑
         /// </summary>
-        public string ImageBase64 { get; set; }
+        public string ImagePath { get; set; }
+
+        /// <summary>
+        /// 原始檔名
+        /// </summary>
+        public string Name { get; set; }
     }
 }

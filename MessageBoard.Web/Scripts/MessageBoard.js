@@ -7,7 +7,8 @@
             previewImages: []
         }, // 使用者當前輸入的留言
         messages: [], // 留言列表
-        userId: window.userId
+        userId: window.userId,
+        serverRoot: serverRoot
     },
 
     computed: {
@@ -228,6 +229,10 @@
                         console.warn("未預期的動作類型");
                     }
             }
+        },
+
+        resolveUrl(originalUrl) {
+            return this.serverRoot + originalUrl.substring(2);
         },
 
         authorizeUser(messageOwnerId) {
