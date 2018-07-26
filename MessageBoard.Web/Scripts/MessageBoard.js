@@ -202,8 +202,40 @@
                 }.bind(this));
         },
 
-        deleteMessage() {
-            // TODO delete message
+        // 刪除留言
+        deleteMessage(messageId) {
+            swal({
+                title: "這是不可逆的操作，確定嗎",
+                type: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#007bff",
+                confirmButtonText: "確定",
+                cancelButtonText: "取消"
+            }).then(function (result) {
+                if (result.value) {
+                    axios.post(Router.action("Home", "DeleteMessage"), { messageId })
+                        .then(function (response) {
+                            const data = response.data;
+                            if (data.Success !== true) {
+                                if (data.Message) {
+                                    swal(data.Message);
+                                }
+                            }
+                        }.bind(this))
+                        .catch(function (error) {
+                            if (error.response) {
+                                console.log(error.response.data);
+                                console.log(error.response.status);
+                                console.log(error.response.headers);
+                            } else if (error.request) {
+                                console.log(error.request);
+                            } else {
+                                console.log('Error', error.message);
+                            }
+                            console.log(error.config);
+                        }.bind(this));
+                }
+            }.bind(this));
         },
 
         /**

@@ -3,7 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
+    using System.IO;
     using System.Linq;
+    using System.Web;
 
     using MessageBoard.Library.Models;
     using MessageBoard.Library.ViewModels.Messages;
@@ -181,6 +183,7 @@
                         FileName = image.Name
                     });
                 }
+
                 this.Database.Messages.Add(message);
                 this.Database.SaveChanges();
                 return PoResult<Message>.PoSuccess(message);
@@ -190,5 +193,45 @@
                 return PoResult<Message>.Exception(e);
             }
         }
+
+        /// <summary>
+        /// 使用訊息Id、使用者Id、是否為管理員，刪除訊息
+        /// </summary>
+        /// <param name="messageId">訊息Id</param>
+        /// <param name="userId">使用者Id</param>
+        /// <param name="isAdmin">是否為管理員</param>
+        /// <returns>刪除結果</returns>
+        public PoResult DeleteMessage(Guid messageId, Guid userId, bool isAdmin)
+        {
+            try
+            {
+                var message = this.Database.Messages.FirstOrDefault(o => o.Id == messageId && (isAdmin || o.UserId == userId));
+                if (message == null)
+                    return PoResult.DbNotFound();
+                this.Database.Messages.Remove(message);
+                if (message.ParentMessageId != null)
+                {
+                    this.Database.Messages.RemoveRange(message.Messages1);
+                }
+
+                var imagePaths = new List<string>();
+                imagePaths.AddRange(message.AttachmentImages.Select(o => o.Path));
+                imagePaths.AddRange(message.Messages1.SelectMany(o => o.AttachmentImages.Select(c => c.Path)));
+                this.Database.SaveChanges();
+                foreach (var imagePath in imagePaths)
+                {
+                    var mapPath = HttpContext.Current.Server.MapPath(imagePath);
+                    if (mapPath != null && File.Exists(mapPath))
+                        File.Delete(mapPath);
+                }
+
+                return PoResult.PoSuccess();
+            }
+            catch (Exception e)
+            {
+                return PoResult.Exception(e);
+            }
+        }
+        
     }
 }

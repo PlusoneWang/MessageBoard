@@ -38,10 +38,9 @@
         /// </summary>
         /// <param name="excludeMessages">要排除的訊息的Id清單</param>
         /// <returns>執行結果及訊息列表</returns>
-        public ActionResult GetMessageList(List<string> excludeMessages = null)
+        public ActionResult GetMessageList(List<Guid> excludeMessages = null)
         {
-            var guids = excludeMessages?.Select(o => new Guid(o)).ToList();
-            var getResult = this.messageService.GetMessageListVmList(guids ?? new List<Guid>(), 3);
+            var getResult = this.messageService.GetMessageListVmList(excludeMessages ?? new List<Guid>(), 3);
             return this.Json(getResult, JsonRequestBehavior.AllowGet);
         }
 
@@ -132,6 +131,18 @@
             }
 
             return this.Json(new PoResult { Success = saveResult.Success, Message = saveResult.Message });
+        }
+
+        [HttpPost]
+        public ActionResult DeleteMessage(Guid messageId)
+        {
+            var deleteResult = this.messageService.DeleteMessage(messageId, this.CurrentUser.Id, this.CurrentUser.Id == AppSettings.AdminId);
+            if (deleteResult.Success)
+            {
+                this.hub.Clients.All.updateMessage(messageId, "delete");
+            }
+
+            return this.Json(deleteResult);
         }
     }
 }

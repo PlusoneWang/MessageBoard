@@ -98,7 +98,8 @@
                         <span class="d-inline-block align-middle h-100"></span>
                         <a class="card-link d-inline-block align-middle" href="#">回覆</a>
                         <a class="card-link d-inline-block align-middle" href="#"
-                           v-if="authorizeUser(message.UserId)">刪除</a>
+                           v-if="authorizeUser(message.UserId)"
+                           @@click="deleteMessage(message.MessageId)">刪除</a>
                     </div>
                 </div>
             </div>
