@@ -87,7 +87,7 @@
 
         // 捲動更新
         $(window).scroll(this.tryLoadMoreMessages);
-        
+
         // signalr
         var messageHub = $.connection.messageHub;
         messageHub.client.updateMessage = this.updateMessage;
@@ -447,14 +447,51 @@
         // 是否可編輯
         editable(messageOwnerId) {
             return messageOwnerId === this.userId;
-        }
+        },
+
+        // 用於回覆輸入框的初始化
+        hasReplyInit(message) {
+            if (typeof message.currentReply === "undefined") {
+
+                var currentReply = {
+                    message: "",
+                    images: [],
+                    previewImages: []
+                }
+
+                Vue.set(message, "currentReply", currentReply);
+            }
+            
+            return true;
+        },
+
+        // 載入回覆的圖片預覽
+        loadReplyPreviewImage(event, message) {
+            const fileInput = event.target;
+            if (fileInput.files && fileInput.files.length > 0) {
+                for (const file of fileInput.files) {
+                    message.currentReply.images.push(file);
+                    const fileReader = new FileReader();
+                    fileReader.onload = function (e) {
+                        message.currentReply.previewImages.push(e.target.result);
+                    }.bind(this);
+                    fileReader.readAsDataURL(file);
+                }
+
+                fileInput.value = "";
+            }
+        },
+
+        // 刪除回覆預覽圖
+        // TODO
+        removeReplyPreviewImage() {}
     }
 });
 
 
-$(function() {
+$(function () {
     // 編輯視窗隱藏
-    $("#editMessageModal").on("hidden.bs.modal",  function (e) {
+    $("#editMessageModal").on("hidden.bs.modal", function (e) {
         messageBoard.currentEdit.messageId = null;
         messageBoard.currentEdit.context = "";
         messageBoard.currentEdit.imageDelete = [];
