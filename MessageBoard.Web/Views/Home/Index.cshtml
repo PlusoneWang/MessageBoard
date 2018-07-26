@@ -96,9 +96,13 @@
                     </div>
                     <div class="text-right flex-fill">
                         <span class="d-inline-block align-middle h-100"></span>
-                        <a class="card-link d-inline-block align-middle" href="#">回覆</a>
                         <a class="card-link d-inline-block align-middle" href="#"
-                           v-if="authorizeUser(message.UserId)"
+                           @*data-toggle="modal" data-target="#exampleModal"*@
+                           v-if="editable(message.UserId)"
+                           @@click="onEdit(message)"
+                           >編輯</a>
+                        <a class="card-link d-inline-block align-middle" href="#"
+                           v-if="deleteable(message.UserId)"
                            @@click="deleteMessage(message.MessageId)">刪除</a>
                     </div>
                 </div>
@@ -236,12 +240,94 @@
     </div>
     <h2 class="font-weight-bold text-info text-center" v-else>這裡空空如也，成為第一個留言者吧!</h2>
     <div id="dataFlag"></div>
+
+    <div class="modal fade" id="editMessageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="card">
+                    <!-- body -->
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="flex-column px-2">
+                                <img src="@((ViewBag.CurrentUser as AppUser).HeadPortraitPath)" height="40" width="40" style="border-radius: 50%;" />
+                            </div>
+                            <div class="flex-fill">
+                                <textarea class="w-100" style="border: none; resize: none; overflow: hidden;" placeholder="嗨，@(User.Identity.Name)，在想些什麼?" maxlength="300"
+                                          v-model="currentEdit.context"></textarea>
+                            </div>
+                        </div>
+                        <hr v-if="showEditMessageImageRow" />
+                        <div class="card-columns"
+                             v-if="showEditMessageImageRow">
+                            <div class="card w-auto"
+                                 v-for="(image, index) in currentEdit.currentImages">
+                                <div class="card-img">
+                                    <img height="100" width="100"
+                                         :src="image.srcValue"
+                                         :alt="currentEdit.currentImages[index].name" />
+                                </div>
+                                <div class="card-img-overlay p-0"
+                                     :title="currentEdit.currentImages[index].name">
+                                    <button type="button" class="close" aria-label="Close"
+                                            @@click="removeCurrentEditImage(image)">
+                                        <span class="align-top" aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card w-auto">
+                                <div class="card-img">
+                                    <div class="btn btn-outline-light" style="position: relative; overflow: hidden; width: 100px; height: 100px; top: 0; left: 0;">
+                                        <svg class="feather align-middle">
+                                            <use xlink:href="~/Content/feather-sprite.svg#plus" />
+                                        </svg>
+                                        <input type="file" multiple accept="image/*" style="top: 0; cursor: pointer; height: 300px; margin: 0; opacity: 0; padding: 0; position: absolute; font-size: 1001px !important; right: 0;"
+                                               @@change="loadPreviewEditMesageImage" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- footer -->
+                    <div class="card-footer">
+                        <div class="row px-3">
+                            <div class="flex-column">
+                                <div style="height: 38px; width: 90px;">
+                                    <div class="btn btn-outline-info" style="position: relative; overflow: hidden;">
+                                        新增照片
+                                        <input type="file" multiple accept="image/*" style="bottom: 0; cursor: pointer; height: 300px; margin: 0; opacity: 0; padding: 0; position: absolute; font-size: 1001px !important; right: 0;"
+                                               @@change="loadPreviewEditMesageImage" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right flex-fill">
+                                <button type="button" class="btn btn-light" data-dismiss="modal">
+                                    取消
+                                </button>
+                                <button type="button" class="btn btn-primary"
+                                        v-if="editSaveable"
+                                        @@click="saveEdit">
+                                    儲存
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @section scripts
 {
     <script>
         const serverRoot = "@Url.Content("~")";
         const userId = "@((ViewBag.CurrentUser as AppUser).Id)";
+        @if ((ViewBag.CurrentUser as AppUser).Id == AppSettings.AdminId)
+        {
+            <text>
+        const isAdmin = true;
+            </text>
+        }
     </script>
     <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>
     <script src="~/Scripts/vue.js"></script>

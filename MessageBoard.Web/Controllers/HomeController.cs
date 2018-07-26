@@ -120,8 +120,9 @@
             }
             else
             {
+                if (images != null)
                 foreach (var image in messageCreateModel.Images)
-                {
+                    {
                     var mapPath = this.Server.MapPath(image.Path);
                     if (System.IO.File.Exists(mapPath))
                     {
@@ -133,6 +134,11 @@
             return this.Json(new PoResult { Success = saveResult.Success, Message = saveResult.Message });
         }
 
+        /// <summary>
+        /// 刪除訊息
+        /// </summary>
+        /// <param name="messageId">訊息Id</param>
+        /// <returns>刪除結果</returns>
         [HttpPost]
         public ActionResult DeleteMessage(Guid messageId)
         {
@@ -143,6 +149,99 @@
             }
 
             return this.Json(deleteResult);
+        }
+
+        /// <summary>
+        /// 更新訊息
+        /// </summary>
+        /// <param name="messageId">訊息Id</param>
+        /// <param name="context">訊息內容</param>
+        /// <param name="deleteImages">要刪除的圖片</param>
+        /// <param name="images">附件圖片清單</param>
+        /// <returns>更新結果</returns>
+        [HttpPost]
+        public ActionResult UpdateMessage(Guid messageId, string context, Guid[] deleteImages, HttpPostedFileBase[] images)
+        {
+            // 驗證
+            if (context.Length > 300)
+            {
+                return this.Json(PoResult.Fail("訊息內容超出限制，最多為300字"));
+            }
+
+
+            // 驗證
+            if (context.Length == 0 && images == null)
+            {
+                return this.Json(PoResult.Fail("沒有可以儲存的訊息內容"));
+            }
+
+            // 組裝model
+            var messageUpdateModel = new MessageUpdateModel()
+            {
+                MessageId = messageId,
+                Context = context,
+                DeleteAttachmentIds = deleteImages?.ToList() ?? new List<Guid>()
+            };
+
+            if (images != null)
+            {
+                foreach (var image in images)
+                {
+                    if (image == null || image.ContentLength == 0)
+                    {
+                        continue;
+                    }
+
+                    if (image.ContentLength > 1024 * 1024)
+                    {
+                        return this.Json(PoResult.Fail($"檔案「{image.FileName}」大小超出限制，最大1MB"));
+                    }
+
+                    try
+                    {
+                        using (new System.Drawing.Bitmap(image.InputStream))
+                        {
+                            // ignore
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        return this.Json(PoResult.Fail($"檔案「{image.FileName}」格式錯誤，請確定上傳的是圖片"));
+                    }
+
+                    image.InputStream.Position = 0;
+                }
+
+                foreach (var image in images)
+                {
+                    var fileResult = image.SaveAsLocal("AttachmentImages");
+                    messageUpdateModel.NewAttachments.Add(($"{fileResult.OriName}{fileResult.Extension}", fileResult.VirtualPath));
+                }
+            }
+
+            var updateResult = this.messageService.UpdateMessage(this.CurrentUser.Id, messageUpdateModel);
+            if (updateResult.Success)
+            {
+                var messageListVmResult = this.messageService.GetMessageListVm(updateResult.Data.Id);
+                if (messageListVmResult.Success)
+                {
+                    this.hub.Clients.All.updateMessage(messageListVmResult.Data.MessageId, "updateMessage", messageListVmResult.Data);
+                }
+            }
+            else
+            {
+                if (images != null)
+                    foreach (var image in messageUpdateModel.NewAttachments)
+                    {
+                        var mapPath = this.Server.MapPath(image.Path);
+                        if (System.IO.File.Exists(mapPath))
+                        {
+                            System.IO.File.Delete(mapPath);
+                        }
+                    }
+            }
+
+            return this.Json(new PoResult { Success = updateResult.Success, Message = updateResult.Message });
         }
     }
 }

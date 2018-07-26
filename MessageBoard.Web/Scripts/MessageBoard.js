@@ -7,8 +7,17 @@
             previewImages: []
         }, // 使用者當前輸入的留言
         messages: [], // 留言列表
-        userId: userId,
-        serverRoot: serverRoot
+        userId: userId, // 當前的使用者
+        serverRoot: serverRoot,
+
+        // 當前編輯物件
+        currentEdit: {
+            messageId: null, // 訊息Id
+            context: "", // 訊息內容
+            imageDelete: [], // 要刪除的圖片
+            imageNew: [], // 要新增的圖片
+            currentImages: [] // 顯示中的圖片(包含預覽圖)
+        }
     },
 
     computed: {
@@ -30,6 +39,15 @@
         // 當前已顯示的訊息的Id陣列
         messageIds() {
             return this.messages.map(o => o.MessageId);
+        },
+
+        showEditMessageImageRow() {
+            return this.currentEdit.currentImages.length > 0;
+        },
+
+        // 是否可儲存編輯
+        editSaveable() {
+            return this.currentEdit.context.length > 0 || this.currentEdit.currentImages.length > 0;
         }
     },
 
@@ -69,7 +87,7 @@
 
         // 捲動更新
         $(window).scroll(this.tryLoadMoreMessages);
-
+        
         // signalr
         var messageHub = $.connection.messageHub;
         messageHub.client.updateMessage = this.updateMessage;
@@ -202,6 +220,116 @@
                 }.bind(this));
         },
 
+        // 編輯訊息(初始化)
+        onEdit(message) {
+            this.currentEdit.messageId = message.MessageId;
+            this.currentEdit.context = message.Context;
+            this.currentEdit.currentImages = JSON.parse(JSON.stringify(message.AttachmentList));
+
+            for (const image of this.currentEdit.currentImages) {
+                image.srcValue = this.resolveUrl(image.ImagePath);
+            }
+
+            $("#editMessageModal").modal("show");
+        },
+
+        // 編輯功能，載入預覽圖
+        loadPreviewEditMesageImage(event) {
+            const fileInput = event.target;
+            if (fileInput.files && fileInput.files.length > 0) {
+                for (const file of fileInput.files) {
+                    const fileSizeInMb = file.size / 1024 / 1024;
+                    if (fileSizeInMb > 1) {
+                        swal(`檔案${
+                            escape(file.name)
+                            }的大小超出限制\n允許的檔案大小為: 1 MB\n該檔案的大小為: ${
+                            fileSizeInMb.toFixed(4)
+                            } MB`);
+                        fileInput.value = "";
+                        return;
+                    }
+                }
+
+                for (const file of fileInput.files) {
+                    const localId = Plusone.newGuid();
+                    this.currentEdit.imageNew.push({ localId, file });
+                    const fileReader = new FileReader();
+                    fileReader.onload = function (e) {
+                        this.currentEdit.currentImages.push({ ImageId: null, srcValue: e.target.result, localId });
+                    }.bind(this);;
+                    fileReader.readAsDataURL(file);
+                }
+
+                fileInput.value = "";
+            }
+        },
+
+        // 移除編輯中的圖片
+        removeCurrentEditImage(image) {
+            const indexOfCurrent = this.currentEdit.currentImages.indexOf(image);
+            if (indexOfCurrent === -1) return;
+            if (image.ImageId !== null) {
+                this.currentEdit.imageDelete.push(image.ImageId);
+            } else {
+                const indexOfNew = this.currentEdit.imageNew.findIndex((ele) => ele.localId === image.localId);
+                if (indexOfNew !== -1)
+                    this.currentEdit.imageNew.splice(indexOfNew, 1);
+            }
+
+            this.currentEdit.currentImages.splice(indexOfCurrent, 1);
+            return;
+        },
+
+        // 儲存編輯
+        saveEdit() {
+            if (this.editSaveable !== true) {
+                swal("沒有可以儲存的內容，請再試一次。");
+                return false;
+            }
+
+            const formData = new FormData();
+            let index = 0;
+            for (const image of this.currentEdit.imageNew) {
+                formData.append(`images[${
+                    index
+                    }]`,
+                    image.file,
+                    image.file.name);
+                index++;
+            }
+
+            formData.append("messageId", this.currentEdit.messageId);
+            formData.append("context", this.currentEdit.context);
+            formData.append("deleteImages", this.currentEdit.imageDelete);
+
+            const config = {
+                headers: { 'content-type': 'multipart/form-data' }
+            }
+            axios.post(Router.action("Home", "UpdateMessage"), formData, config)
+                .then(function (response) {
+                    $("#editMessageModal").modal("hide");
+                    const data = response.data;
+                    if (data.Success !== true) {
+                        swal(`${
+                            data.Message
+                            }`);
+                    }
+
+                }.bind(this))
+                .catch(function (error) {
+                    if (error.response) {
+                        console.log(error.response.data);
+                        console.log(error.response.status);
+                        console.log(error.response.headers);
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
+                    console.log(error.config);
+                }.bind(this));
+        },
+
         // 刪除留言
         deleteMessage(messageId) {
             swal({
@@ -306,12 +434,31 @@
             }
         },
 
+        // 產出image路徑
         resolveUrl(originalUrl) {
             return this.serverRoot + originalUrl.substring(2);
         },
 
-        authorizeUser(messageOwnerId) {
+        // 是否可刪除
+        deleteable(messageOwnerId) {
+            return (messageOwnerId === this.userId) || (typeof isAdmin != typeof void 0 && isAdmin === true);
+        },
+
+        // 是否可編輯
+        editable(messageOwnerId) {
             return messageOwnerId === this.userId;
         }
     }
 });
+
+
+$(function() {
+    // 編輯視窗隱藏
+    $("#editMessageModal").on("hidden.bs.modal",  function (e) {
+        messageBoard.currentEdit.messageId = null;
+        messageBoard.currentEdit.context = "";
+        messageBoard.currentEdit.imageDelete = [];
+        messageBoard.currentEdit.imageNew = [];
+        messageBoard.currentEdit.currentImages = [];
+    });
+})

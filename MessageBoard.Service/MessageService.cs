@@ -232,6 +232,53 @@
                 return PoResult.Exception(e);
             }
         }
-        
+
+        /// <summary>
+        /// 使用使用者Id、訊息更新物件，更新訊息
+        /// </summary>
+        /// <param name="userId">使用者Id</param>
+        /// <param name="updateMessage">訊息更新物件</param>
+        /// <returns>更新結果</returns>
+        public PoResult<Message> UpdateMessage(Guid userId, MessageUpdateModel updateMessage)
+        {
+            try
+            {
+                var message = this.Database.Messages.FirstOrDefault(o => o.UserId == userId && o.Id == updateMessage.MessageId);
+                if (message == null)
+                    return PoResult<Message>.DbNotFound();
+                message.Context = updateMessage.Context;
+
+                // delete attachment
+                var toDeleteAttachmentImages = message.AttachmentImages.Where(o => updateMessage.DeleteAttachmentIds.Contains(o.Id));
+                var toDeletePaths = toDeleteAttachmentImages.Select(o => o.Path).AsEnumerable().ToList();
+                this.Database.AttachmentImages.RemoveRange(toDeleteAttachmentImages);
+                foreach (var newAttachment in updateMessage.NewAttachments)
+                {
+                    this.Database.AttachmentImages.Add(
+                        new AttachmentImage
+                        {
+                            Id = Ci.Sequential.Guid.Create(),
+                            MessageId = message.Id,
+                            FileName = newAttachment.Name,
+                            Path = newAttachment.Path
+                        });
+                }
+
+                this.Database.SaveChanges();
+
+                foreach (var deletePath in toDeletePaths)
+                {
+                    var mapPath = HttpContext.Current.Server.MapPath(deletePath);
+                    if (mapPath != null && File.Exists(mapPath))
+                        File.Delete(mapPath);
+                }
+
+                return PoResult<Message>.PoSuccess(message);
+            }
+            catch (Exception e)
+            {
+                return PoResult<Message>.Exception(e);
+            }
+        }
     }
 }
