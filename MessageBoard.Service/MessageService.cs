@@ -52,7 +52,7 @@
                         ReplyMessages =
                             this.Database.Messages
                                 .Where(o => o.ParentMessageId != null && o.ParentMessageId.Value == message.Id)
-                                .OrderByDescending(o => o.CreateTime)
+                                .OrderBy(o => o.CreateTime)
                                 .AsEnumerable()
                                 .Select(o => new MessageListVm
                                 {

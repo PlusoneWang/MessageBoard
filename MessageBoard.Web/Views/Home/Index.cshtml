@@ -4,6 +4,7 @@
 @section content{
     <link href="~/Content/message-board.css" rel="stylesheet" />
 }
+
 <div id="app" class="pt-3">
     <!-- 留言 -->
     <div class="card">
@@ -99,8 +100,7 @@
                         <a class="card-link d-inline-block align-middle" href="#"
                            @*data-toggle="modal" data-target="#exampleModal"*@
                            v-if="editable(message.UserId)"
-                           @@click="onEdit(message)"
-                           >編輯</a>
+                           @@click="onEdit(message)">編輯</a>
                         <a class="card-link d-inline-block align-middle" href="#"
                            v-if="deleteable(message.UserId)"
                            @@click="deleteMessage(message.MessageId)">刪除</a>
@@ -235,12 +235,30 @@
                     <div class="btn btn-outline-dark" style="width: 100%"
                          v-if="message.AttachmentList.length>5"><h2 style="color: #696969;">還有{{message.AttachmentList.length-5}}張</h2></div>
                 </div>
+                <ul class="list-group list-group-flush mt-2">
+                    <li class="list-group-item">
+                        <div class="row mx-0">
+                            <div class="flex-column">
+                                <img src="@((ViewBag.CurrentUser as AppUser).HeadPortraitPath)" height="36" width="36" style="border-radius: 50%; " />
+                            </div>
+                            <div class="flex-fill pl-2">
+                                <input type="text" class="form-control d-inline-block" placeholder="回覆..." style="border-radius: 19px; width: calc(100% - 60px);" />
+                                <button class="btn btn-outline-info" style="height: 38px; width: 50px; margin-top: -3px;">
+                                    <svg class="feather align-middle">
+                                        <use xlink:href="~/Content/feather-sprite.svg#send" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
     <h2 class="font-weight-bold text-info text-center" v-else>這裡空空如也，成為第一個留言者吧!</h2>
     <div id="dataFlag"></div>
 
+    <!-- modal -->
     <div class="modal fade" id="editMessageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -317,6 +335,7 @@
         </div>
     </div>
 </div>
+
 @section scripts
 {
     <script>

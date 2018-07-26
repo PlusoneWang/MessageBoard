@@ -382,10 +382,10 @@
                     }
                 case "newReply":
                     {
-                        // insert new reply to target message
+                        // push new reply to target message
                         const message = this.messages.find((element) => { return element.MessageId === targetId });
                         if (message) {
-                            message.ReplyMessages.splice(0, 0, data);
+                            message.ReplyMessages.push(data);
                         }
                         break;
                     }
