@@ -23,6 +23,3 @@
     color: #CCCCCC;
 }
 
-.message:not(:first-child) {
-    margin-top: 20px;
-}

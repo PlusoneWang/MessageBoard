@@ -39,9 +39,9 @@
                         MessageId = message.Id,
                         Context = message.Context,
                         Time = $"{message.CreateTime: yyyy-MM-dd HH:mm:ss}",
-                        AttahmentList =
+                        AttachmentList =
                                                     message.AttachmentImages.Select(
-                                                        o => new Attahment
+                                                        o => new Attachment
                                                         {
                                                             ImageId = o.Id,
                                                             Name = o.FileName,
@@ -60,9 +60,9 @@
                                     MessageId = o.Id,
                                     Context = o.Context,
                                     Time = $"{o.CreateTime: yyyy-MM-dd HH:mm:ss}",
-                                    AttahmentList =
+                                    AttachmentList =
                                         o.AttachmentImages.Select(
-                                            c => new Attahment
+                                            c => new Attachment
                                             {
                                                 ImageId = c.Id,
                                                 Name = c.FileName,
@@ -106,9 +106,9 @@
                     MessageId = message.Id,
                     Context = message.Context,
                     Time = $"{message.CreateTime: yyyy-MM-dd HH:mm:ss}",
-                    AttahmentList =
+                    AttachmentList =
                                                     message.AttachmentImages.Select(
-                                                        o => new Attahment
+                                                        o => new Attachment
                                                         {
                                                             ImageId = o.Id,
                                                             Name = o.FileName,
@@ -127,9 +127,9 @@
                                     MessageId = o.Id,
                                     Context = o.Context,
                                     Time = $"{o.CreateTime: yyyy-MM-dd HH:mm:ss}",
-                                    AttahmentList =
+                                    AttachmentList =
                                         o.AttachmentImages.Select(
-                                            c => new Attahment
+                                            c => new Attachment
                                             {
                                                 ImageId = c.Id,
                                                 Name = c.FileName,

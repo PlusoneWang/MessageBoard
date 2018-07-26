@@ -36,7 +36,7 @@
         /// <summary>
         /// 附件圖片清單
         /// </summary>
-        public List<Attahment> AttahmentList { get; set; } = new List<Attahment>();
+        public List<Attachment> AttachmentList { get; set; } = new List<Attachment>();
 
         /// <summary>
         /// 留言時間
@@ -52,7 +52,7 @@
     /// <summary>
     /// 訊息附件(圖片)
     /// </summary>
-    public class Attahment
+    public class Attachment
     {
         /// <summary>
         /// 訊息Id

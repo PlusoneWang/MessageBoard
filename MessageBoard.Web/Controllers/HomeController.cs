@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
     using System.Web;
     using System.Web.Mvc;
@@ -37,9 +38,10 @@
         /// </summary>
         /// <param name="excludeMessages">要排除的訊息的Id清單</param>
         /// <returns>執行結果及訊息列表</returns>
-        public ActionResult GetMessageList(List<Guid> excludeMessages = null)
+        public ActionResult GetMessageList(List<string> excludeMessages = null)
         {
-            var getResult = this.messageService.GetMessageListVmList(excludeMessages ?? new List<Guid>(), 3);
+            var guids = excludeMessages?.Select(o => new Guid(o)).ToList();
+            var getResult = this.messageService.GetMessageListVmList(guids ?? new List<Guid>(), 3);
             return this.Json(getResult, JsonRequestBehavior.AllowGet);
         }
 

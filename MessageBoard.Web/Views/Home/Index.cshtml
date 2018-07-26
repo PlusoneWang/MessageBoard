@@ -1,6 +1,9 @@
 ﻿@{
     ViewBag.Title = "留言板";
 }
+@section content{
+    <link href="~/Content/message-board.css" rel="stylesheet" />
+}
 <div id="app" class="pt-3">
     <!-- 留言 -->
     <div class="card">
@@ -103,38 +106,135 @@
                 <div class="card-text">
                     {{message.Context}}
                 </div>
-                <hr v-if="message.AttahmentList.length>0" />
-                <div class="card-columns">
-                    <div class="card bg-dark text-white">
-                        <img class="card-img" src="https://fakeimg.pl/335x180/" alt="Card image" style="max-width: 350px; max-height: 350px;">
-                        <div class="card-img-overlay">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            <p class="card-text">Last updated 3 mins ago</p>
+                <hr v-if="message.AttachmentList.length>0" />
+                <!-- 1 -->
+                <div v-if="message.AttachmentList.length==1" key="count1">
+                    <a href="#">
+                        <div style="padding-top: 56.25%; overflow: hidden;position:relative;">
+                            <img style="position:absolute;top:-50%; bottom:-50%;margin:auto;width: 100%;height: auto;"
+                                 :src="resolveUrl(message.AttachmentList[0].ImagePath)" />
                         </div>
+                    </a>
+                </div>
+
+                <!-- 2 -->
+                <div v-if="message.AttachmentList.length==2" key="count2">
+                    <a href="#" style="width: calc(50% - 3px); position: relative; display: inline-block;">
+                        <div style="padding-top: 56.25%; overflow: hidden;position:relative;">
+                            <img style="position:absolute;top:-50%; bottom:-50%;margin:auto;width: 100%;height: auto;"
+                                 :src="resolveUrl(message.AttachmentList[0].ImagePath)" />
+                        </div>
+                    </a>
+                    <a href="#" style="width: calc(50% - 3px); position: relative; display: inline-block;">
+                        <div style="padding-top: 56.25%; overflow: hidden;position:relative;">
+                            <img style="position:absolute;top:-50%; bottom:-50%;margin:auto;width: 100%;height: auto;"
+                                 :src="resolveUrl(message.AttachmentList[1].ImagePath)" />
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 3 -->
+                <div v-if="message.AttachmentList.length==3" key="count3" style="width: 100%;">
+                    <div style="width: calc(50% - 3px); display: inline-block;">
+                        <a href="#">
+                            <div style="padding-top: 112.5%; overflow: hidden; position: relative;">
+                                <img style="position: absolute; left: 50%; top: 50%; -webkit-transform: translateY(-50%) translateX(-50%); height: 100%;"
+                                     :src="resolveUrl(message.AttachmentList[0].ImagePath)" />
+                            </div>
+                        </a>
                     </div>
-                    <div class="card bg-dark text-white">
-                        <img class="card-img" src="https://fakeimg.pl/225x180/" alt="Card image" style="max-width: 350px; max-height: 350px;">
-                        <div class="card-img-overlay">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            <p class="card-text">Last updated 3 mins ago</p>
-                        </div>
-                    </div>
-                    <div class="card bg-dark text-white">
-                        <img class="card-img" src="https://fakeimg.pl/720x180/" alt="Card image" style="max-width: 350px; max-height: 350px;">
-                        <div class="card-img-overlay">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            <p class="card-text">Last updated 3 mins ago</p>
-                        </div>
+                    <div style="width: calc(50% - 3px); display: inline-block;">
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[1].ImagePath)" />
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[2].ImagePath)" />
+                            </div>
+                        </a>
                     </div>
                 </div>
-                <!-- TODO show image -->
+
+                <!-- 4 -->
+                <div v-if="message.AttachmentList.length==4" key="count4" style="width: 100%;">
+                    <div style="width: calc(50% - 3px); display: inline-block;">
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[0].ImagePath)" />
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[1].ImagePath)" />
+                            </div>
+                        </a>
+                    </div>
+                    <div style="width: calc(50% - 3px); display: inline-block;">
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[2].ImagePath)" />
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[3].ImagePath)" />
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 5 and more -->
+                <div v-if="message.AttachmentList.length>=5" key="count5" style="width: 100%;">
+                    <div style="width: calc(50% - 3px); display: inline-block;">
+                        <a href="#">
+                            <div style="padding-top: 84.375%; overflow: hidden; position: relative;">
+                                <img style="position: absolute; left: 50%; top: 50%; -webkit-transform: translateY(-50%) translateX(-50%); height: 100%;"
+                                     :src="resolveUrl(message.AttachmentList[0].ImagePath)" />
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div style="padding-top: 84.375%; overflow: hidden; position: relative; margin-top: 6px;">
+                                <img style="position: absolute; left: 50%; top: 50%; -webkit-transform: translateY(-50%) translateX(-50%); height: 100%;"
+                                     :src="resolveUrl(message.AttachmentList[1].ImagePath)" />
+                            </div>
+                        </a>
+                    </div>
+                    <div style="width: calc(50% - 3px); display: inline-block;">
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[2].ImagePath)" />
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[3].ImagePath)" />
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
+                                <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
+                                     :src="resolveUrl(message.AttachmentList[4].ImagePath)" />
+                            </div>
+                        </a>
+                    </div>
+                    <div class="btn btn-outline-dark" style="width: 100%"
+                         v-if="message.AttachmentList.length>5"><h2 style="color: #696969;">還有{{message.AttachmentList.length-5}}張</h2></div>
+                </div>
             </div>
         </div>
     </div>
     <h2 class="font-weight-bold text-info text-center" v-else>這裡空空如也，成為第一個留言者吧!</h2>
+    <div id="dataFlag"></div>
 </div>
 @section scripts
 {

@@ -1,0 +1,11 @@
+﻿.message:not(:first-child) {
+    margin-top: 20px;
+}
+
+a div {
+    background-color: #000000;
+}
+
+a img:hover {
+    opacity: 0.8;
+}

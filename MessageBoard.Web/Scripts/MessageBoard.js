@@ -44,7 +44,33 @@
     },
 
     created() {
-        this.loadMoreMessages();
+        // get messages
+        axios.post(Router.action("Home", "GetMessageList"))
+            .then(function (response) {
+                const data = response.data;
+                if (data.Success === true) {
+                    this.messages = this.messages.concat(data.Data);
+                    return;
+                }
+                swal(`${data.Message}`);
+            }.bind(this))
+            .catch(function (error) {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+            }.bind(this));
+
+        // 捲動更新
+        $(window).scroll(this.tryLoadMoreMessages);
+
+        // signalr
         var messageHub = $.connection.messageHub;
         messageHub.client.updateMessage = this.updateMessage;
         $.connection.hub.start();
@@ -58,7 +84,11 @@
                 for (const file of fileInput.files) {
                     const fileSizeInMb = file.size / 1024 / 1024;
                     if (fileSizeInMb > 1) {
-                        swal(`檔案${escape(file.name)}的大小超出限制\n允許的檔案大小為: 1 MB\n該檔案的大小為: ${fileSizeInMb.toFixed(4)} MB`);
+                        swal(`檔案${
+                            escape(file.name)
+                            }的大小超出限制\n允許的檔案大小為: 1 MB\n該檔案的大小為: ${
+                            fileSizeInMb.toFixed(4)
+                            } MB`);
                         fileInput.value = "";
                         return;
                     }
@@ -78,13 +108,22 @@
         },
 
         // 取得新留言
-        loadMoreMessages() {
+        tryLoadMoreMessages() {
+            if (!Utils.isElementInView($('#dataFlag'), false)) return;
+
+            $(window).unbind('scroll', this.tryLoadMoreMessages);
+
             const excludeMessages = this.messageIds;
-            axios.get(Router.action("Home", "GetMessageList"), excludeMessages)
+            axios.post(Router.action("Home", "GetMessageList"), excludeMessages)
                 .then(function (response) {
                     const data = response.data;
                     if (data.Success === true) {
                         this.messages = this.messages.concat(data.Data);
+                        if (data.Data.length === 0) {
+                            $("#dataFlag").remove();
+                        } else {
+                            $(window).scroll(this.tryLoadMoreMessages);
+                        }
                         return;
                     }
                     swal(`${data.Message}`);
@@ -124,7 +163,11 @@
             const formData = new FormData();
             let index = 0;
             for (const image of this.currentMessage.images) {
-                formData.append(`images[${index}]`, image, image.name);
+                formData.append(`images[${
+                    index
+                    }]`,
+                    image,
+                    image.name);
                 index++;
             }
 
@@ -137,7 +180,9 @@
                 .then(function (response) {
                     const data = response.data;
                     if (data.Success !== true) {
-                        swal(`${data.Message}`);
+                        swal(`${
+                            data.Message
+                            }`);
                     }
                     this.currentMessage.images = [];
                     this.currentMessage.previewImages.length = 0;
@@ -193,8 +238,7 @@
                                 data.ReplyMessages = replyMessages;
                                 this.messages.splice(i, 1, data);
                                 break;
-                            }
-                            else if (this.messages[i].ReplyMessages.length > 0) {
+                            } else if (this.messages[i].ReplyMessages.length > 0) {
                                 for (let j = 0; j < this.messages[i].ReplyMessages.length; j++) {
                                     if (this.messages[i].ReplyMessages[j].MessageId === targetId) {
                                         this.messages[i].ReplyMessages[j].splice(j, 1, data);
@@ -212,8 +256,7 @@
                             if (this.messages[i].MessageId === targetId) {
                                 this.messages.splice(i, 1);
                                 break;
-                            }
-                            else if (this.messages[i].ReplyMessages.length > 0) {
+                            } else if (this.messages[i].ReplyMessages.length > 0) {
                                 for (let j = 0; j < this.messages[i].ReplyMessages.length; j++) {
                                     if (this.messages[i].ReplyMessages[j].MessageId === targetId) {
                                         this.messages[i].ReplyMessages[j].splice(j, 1);
@@ -239,4 +282,4 @@
             return messageOwnerId === this.userId;
         }
     }
-})
+});
