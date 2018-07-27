@@ -208,15 +208,17 @@
                 var message = this.Database.Messages.FirstOrDefault(o => o.Id == messageId && (isAdmin || o.UserId == userId));
                 if (message == null)
                     return PoResult.DbNotFound();
+
+                var imagePaths = new List<string>();
+                imagePaths.AddRange(message.AttachmentImages.Select(o => o.Path));
+                imagePaths.AddRange(message.Messages1.SelectMany(o => o.AttachmentImages.Select(c => c.Path)));
+
                 this.Database.Messages.Remove(message);
                 if (message.ParentMessageId != null)
                 {
                     this.Database.Messages.RemoveRange(message.Messages1);
                 }
-
-                var imagePaths = new List<string>();
-                imagePaths.AddRange(message.AttachmentImages.Select(o => o.Path));
-                imagePaths.AddRange(message.Messages1.SelectMany(o => o.AttachmentImages.Select(c => c.Path)));
+                
                 this.Database.SaveChanges();
                 foreach (var imagePath in imagePaths)
                 {

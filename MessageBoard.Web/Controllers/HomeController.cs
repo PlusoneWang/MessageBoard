@@ -179,7 +179,7 @@
 
 
             // 驗證
-            if (context.Length == 0 && images == null)
+            if (context.Length == 0 && images == null && deleteImages == null)
             {
                 return this.Json(PoResult.Fail("沒有可以儲存的訊息內容"));
             }
