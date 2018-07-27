@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using System.Web;
     using System.Web.Mvc;
 
@@ -49,9 +48,10 @@
         /// </summary>
         /// <param name="messageContext">訊息內容</param>
         /// <param name="images">附件圖片清單</param>
+        /// <param name="parentMessageId">父階留言Id</param>
         /// <returns>儲存結果</returns>
         [HttpPost]
-        public ActionResult SendMessage(string messageContext, HttpPostedFileBase[] images)
+        public ActionResult SendMessage(string messageContext, HttpPostedFileBase[] images, Guid? parentMessageId = null)
         {
             // 驗證
             if (messageContext.Length > 300)
@@ -70,7 +70,7 @@
             {
                 UserId = this.CurrentUser.Id,
                 Context = messageContext,
-                ParentMessageId = null
+                ParentMessageId = parentMessageId
             };
 
             if (images != null)
@@ -115,20 +115,29 @@
                 var messageListVmResult = this.messageService.GetMessageListVm(saveResult.Data.Id);
                 if (messageListVmResult.Success)
                 {
-                    this.hub.Clients.All.updateMessage(messageListVmResult.Data.MessageId, "newMessage", messageListVmResult.Data);
+                    if (saveResult.Data.ParentMessageId == null)
+                    {
+                        // not reply
+                        this.hub.Clients.All.updateMessage(messageListVmResult.Data.MessageId, "newMessage", messageListVmResult.Data);
+                    }
+                    else
+                    {
+                        // is reply
+                        this.hub.Clients.All.updateMessage(saveResult.Data.ParentMessageId, "newReply", messageListVmResult.Data);
+                    }
                 }
             }
             else
             {
                 if (images != null)
-                foreach (var image in messageCreateModel.Images)
+                    foreach (var image in messageCreateModel.Images)
                     {
-                    var mapPath = this.Server.MapPath(image.Path);
-                    if (System.IO.File.Exists(mapPath))
-                    {
-                        System.IO.File.Delete(mapPath);
+                        var mapPath = this.Server.MapPath(image.Path);
+                        if (System.IO.File.Exists(mapPath))
+                        {
+                            System.IO.File.Delete(mapPath);
+                        }
                     }
-                }
             }
 
             return this.Json(new PoResult { Success = saveResult.Success, Message = saveResult.Message });
@@ -242,6 +251,11 @@
             }
 
             return this.Json(new PoResult { Success = updateResult.Success, Message = updateResult.Message });
+        }
+
+        public ActionResult Lab()
+        {
+            return this.View();
         }
     }
 }

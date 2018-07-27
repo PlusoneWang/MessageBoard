@@ -9,3 +9,11 @@ a div {
 a img:hover {
     opacity: 0.8;
 }
+
+.modal-full {
+    min-width: 100%;
+}
+
+    .modal-full .modal-content {
+        min-height: 100vh;
+    }

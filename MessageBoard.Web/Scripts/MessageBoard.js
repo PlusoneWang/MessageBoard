@@ -17,7 +17,10 @@
             imageDelete: [], // 要刪除的圖片
             imageNew: [], // 要新增的圖片
             currentImages: [] // 顯示中的圖片(包含預覽圖)
-        }
+        },
+
+        currentViewImages: [], // 當前觀看的圖片清單
+        startIndex: 0
     },
 
     computed: {
@@ -203,7 +206,7 @@
                             }`);
                     }
                     this.currentMessage.images = [];
-                    this.currentMessage.previewImages.length = 0;
+                    this.currentMessage.previewImages = [];
                     this.currentMessage.message = "";
                 }.bind(this))
                 .catch(function (error) {
@@ -401,7 +404,7 @@
                             } else if (this.messages[i].ReplyMessages.length > 0) {
                                 for (let j = 0; j < this.messages[i].ReplyMessages.length; j++) {
                                     if (this.messages[i].ReplyMessages[j].MessageId === targetId) {
-                                        this.messages[i].ReplyMessages[j].splice(j, 1, data);
+                                        this.messages[i].ReplyMessages.splice(j, 1, data);
                                         break;
                                     }
                                 }
@@ -419,7 +422,7 @@
                             } else if (this.messages[i].ReplyMessages.length > 0) {
                                 for (let j = 0; j < this.messages[i].ReplyMessages.length; j++) {
                                     if (this.messages[i].ReplyMessages[j].MessageId === targetId) {
-                                        this.messages[i].ReplyMessages[j].splice(j, 1);
+                                        this.messages[i].ReplyMessages.splice(j, 1);
                                         break;
                                     }
                                 }
@@ -461,7 +464,7 @@
 
                 Vue.set(message, "currentReply", currentReply);
             }
-            
+
             return true;
         },
 
@@ -483,8 +486,81 @@
         },
 
         // 刪除回覆預覽圖
-        // TODO
-        removeReplyPreviewImage() {}
+        removeReplyPreviewImage(reply, index) {
+            if (Plusone.isDefinded(reply.previewImages)) {
+                reply.previewImages.splice(index, 1);
+                reply.images.splice(index, 1);
+            }
+
+            return;
+        },
+
+        // 是否可回覆
+        replySendable(reply) {
+            return reply.message.length > 0 || reply.images.length > 0;
+        },
+
+        // 送出回覆
+        sendReply(message) {
+            if (!Plusone.isDefinded(message.currentReply)) {
+                swal("頁面載入不完全，請重新進入頁面後再試一次");
+                return;
+            }
+            const reply = message.currentReply;
+            if (reply.message.length === 0 && reply.images.length === 0) {
+                swal("無法發送沒有內容的回覆，請重新進入頁面後再試一次。");
+                return;
+            }
+
+            const formData = new FormData();
+            let index = 0;
+            for (const image of reply.images) {
+                formData.append(`images[${
+                    index
+                    }]`,
+                    image,
+                    image.name);
+                index++;
+            }
+
+            formData.append("messageContext", reply.message);
+            formData.append("parentMessageId", message.MessageId);
+
+            const config = {
+                headers: { 'content-type': 'multipart/form-data' }
+            }
+            axios.post(Router.action("Home", "SendMessage"), formData, config)
+                .then(function (response) {
+                    const data = response.data;
+                    if (data.Success !== true) {
+                        swal(`${
+                            data.Message
+                            }`);
+                    }
+                    reply.images = [];
+                    reply.previewImages = [];
+                    reply.message = "";
+                }.bind(this))
+                .catch(function (error) {
+                    if (error.response) {
+                        console.log(error.response.data);
+                        console.log(error.response.status);
+                        console.log(error.response.headers);
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
+                    console.log(error.config);
+                }.bind(this));
+        },
+
+        viewImages(message, startIndex) {
+            this.startIndex = startIndex;
+            this.currentViewImages = message.AttachmentList;
+            $("#slider").carousel(startIndex);
+            $("#imageViewerModal").modal("show");
+        }
     }
 });
 
@@ -498,4 +574,10 @@ $(function () {
         messageBoard.currentEdit.imageNew = [];
         messageBoard.currentEdit.currentImages = [];
     });
-})
+
+    $("#slider").carousel({ interval: false });
+
+    $("#imageViewerModal").on("hidden.bs.modal", function (e) {
+        messageBoard.currentViewImages = [];
+    });
+});
