@@ -564,7 +564,6 @@
     }
 });
 
-
 $(function () {
     // 編輯視窗隱藏
     $("#editMessageModal").on("hidden.bs.modal", function (e) {
