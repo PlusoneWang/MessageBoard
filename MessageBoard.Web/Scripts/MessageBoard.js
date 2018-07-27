@@ -303,7 +303,12 @@
 
             formData.append("messageId", this.currentEdit.messageId);
             formData.append("context", this.currentEdit.context);
-            formData.append("deleteImages", this.currentEdit.imageDelete);
+
+            index = 0;
+            for (const deleteImageId of this.currentEdit.imageDelete) {
+                formData.append(`deleteImages[${index}]`, deleteImageId);
+                index++;
+            }
 
             const config = {
                 headers: { 'content-type': 'multipart/form-data' }
