@@ -117,7 +117,7 @@
                 <!-- 1 -->
                 <div v-if="message.AttachmentList.length==1" key="count1">
                     <a href="#"
-                       onclick="return void 0;"
+                       onclick="return false;"
                        @@click="viewImages(message, 0)">
                         <div style="padding-top: 56.25%; overflow: hidden; position: relative;">
                             <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -129,7 +129,7 @@
                 <!-- 2 -->
                 <div v-if="message.AttachmentList.length==2" key="count2">
                     <a href="#" style="width: calc(50% - 3px); position: relative; display: inline-block;"
-                       onclick="return void 0;"
+                       onclick="return false;"
                        @@click="viewImages(message, 0)">
                         <div style="padding-top: 56.25%; overflow: hidden; position: relative;">
                             <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -137,7 +137,7 @@
                         </div>
                     </a>
                     <a href="#" style="width: calc(50% - 3px); position: relative; display: inline-block;"
-                       onclick="return void 0;"
+                       onclick="return false;"
                        @@click="viewImages(message, 1)">
                         <div style="padding-top: 56.25%; overflow: hidden; position: relative;">
                             <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -150,7 +150,7 @@
                 <div v-if="message.AttachmentList.length==3" key="count3" style="width: 100%;">
                     <div style="width: calc(50% - 3px); display: inline-block;">
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 0)">
                             <div style="padding-top: 112.5%; overflow: hidden; position: relative;">
                                 <img style="position: absolute; left: 50%; top: 50%; -webkit-transform: translateY(-50%) translateX(-50%); height: 100%;"
@@ -160,7 +160,7 @@
                     </div>
                     <div style="width: calc(50% - 3px); display: inline-block;">
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 1)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -168,6 +168,7 @@
                             </div>
                         </a>
                         <a href="#"
+                           onclick="return false;"
                            @@click="viewImages(message, 2)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -181,7 +182,7 @@
                 <div v-if="message.AttachmentList.length==4" key="count4" style="width: 100%;">
                     <div style="width: calc(50% - 3px); display: inline-block;">
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 0)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -189,7 +190,7 @@
                             </div>
                         </a>
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 1)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -199,7 +200,7 @@
                     </div>
                     <div style="width: calc(50% - 3px); display: inline-block;">
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 2)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -207,7 +208,7 @@
                             </div>
                         </a>
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 3)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -221,7 +222,7 @@
                 <div v-if="message.AttachmentList.length>=5" key="count5" style="width: 100%;">
                     <div style="width: calc(50% - 3px); display: inline-block;">
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 0)">
                             <div style="padding-top: 84.375%; overflow: hidden; position: relative;">
                                 <img style="position: absolute; left: 50%; top: 50%; -webkit-transform: translateY(-50%) translateX(-50%); height: 100%;"
@@ -229,7 +230,7 @@
                             </div>
                         </a>
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 1)">
                             <div style="padding-top: 84.375%; overflow: hidden; position: relative; margin-top: 6px;">
                                 <img style="position: absolute; left: 50%; top: 50%; -webkit-transform: translateY(-50%) translateX(-50%); height: 100%;"
@@ -239,7 +240,7 @@
                     </div>
                     <div style="width: calc(50% - 3px); display: inline-block;">
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 2)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -247,7 +248,7 @@
                             </div>
                         </a>
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 3)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -255,7 +256,7 @@
                             </div>
                         </a>
                         <a href="#"
-                           onclick="return void 0;"
+                           onclick="return false;"
                            @@click="viewImages(message, 4)">
                             <div style="padding-top: 55.8%; overflow: hidden; position: relative; margin-top: 6px;">
                                 <img style="position: absolute; top: -50%; bottom: -50%; margin: auto; width: 100%; height: auto;"
@@ -295,6 +296,7 @@
                                 <div>{{reply.Context}}</div>
                                 <div>
                                     <a href="#"
+                                       onclick="return false";
                                        v-for="(image, replyImageIndex) in reply.AttachmentList"
                                        @@click="viewImages(reply, replyImageIndex)">
                                         <div class="d-inline-block" style="background-color: #000000; height: 100px; width: 100px;">
