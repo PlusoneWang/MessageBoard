@@ -213,8 +213,8 @@
                 imagePaths.AddRange(message.AttachmentImages.Select(o => o.Path));
                 imagePaths.AddRange(message.Messages1.SelectMany(o => o.AttachmentImages.Select(c => c.Path)));
 
+                this.Database.Messages.RemoveRange(message.Messages1);
                 this.Database.Messages.Remove(message);
-                this.Database.Messages.RemoveRange(this.Database.Messages.Where(o => o.ParentMessageId == message.Id));
 
                 this.Database.SaveChanges();
                 foreach (var imagePath in imagePaths)
